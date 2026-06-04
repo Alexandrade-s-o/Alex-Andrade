@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alex Andrade - Desarrollador Multimedia Web</title>
+    <!-- Tema (oscuro/claro) aplicado antes de pintar para evitar parpadeo -->
+    <script>(function () { try { document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; } })();</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,14 +13,51 @@
     <!-- Swiper.js CSS -->
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <style>
+        /* ===== TEMA CLARO (por defecto) ===== */
         :root {
             --bg: #FFFFFF;
             --text: #0F172A;
             --muted: #64748B;
             --accent: #2563EB;
-            --card: #F8FAFC;
-            --border: #E2E8F0;
+            --card: #FFFFFF;
+            --border: #E6EAF2;
+            --header-bg: rgba(255, 255, 255, 0.72);
+            --icon-bg: #EEF2F8;
+            --btn-sec-border: rgba(15, 23, 42, 0.16);
+            --code-text: #334155;
+            --code-shadow: rgba(255, 255, 255, 0.85);
+            --spotlight: rgba(37, 99, 235, 0.10);
+            --tok-kw: #9333ea; --tok-var: #2563eb; --tok-prop: #0e7490;
+            --tok-str: #15803d; --tok-punc: #0891b2; --tok-fn: #b45309; --tok-num: #c2410c;
+            --card-shadow: 0 22px 48px -30px rgba(2, 6, 23, 0.40);
         }
+        /* ===== TEMA OSCURO (Antigravity) ===== */
+        :root[data-theme="dark"] {
+            --bg: #05070D;
+            --text: #E7EBF3;
+            --muted: #8A93A6;
+            --accent: #5B8CFF;
+            --card: #0B0F18;
+            --border: #1A2030;
+            --header-bg: rgba(5, 7, 13, 0.70);
+            --icon-bg: rgba(255, 255, 255, 0.06);
+            --btn-sec-border: rgba(255, 255, 255, 0.18);
+            --code-text: #C9D4E8;
+            --code-shadow: rgba(0, 0, 0, 0);
+            --spotlight: rgba(91, 140, 255, 0.16);
+            --tok-kw: #c792ea; --tok-var: #82aaff; --tok-prop: #7fdbca;
+            --tok-str: #c3e88d; --tok-punc: #89ddff; --tok-fn: #ffcb6b; --tok-num: #f78c6c;
+            --card-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
+        }
+        html { transition: background-color 0.4s ease; }
+
+        /* Clases semánticas (cambian con el tema) */
+        .text-strong { color: var(--text); }
+        .text-soft   { color: var(--muted); }
+        .text-accent { color: var(--accent); }
+        .icon-bg     { background-color: var(--icon-bg); }
+        .hover-soft  { transition: background-color 0.2s ease; }
+        .hover-soft:hover { background-color: var(--icon-bg); }
 
         /* Estilo base — estilo "espacio / red neuronal" */
         html { background-color: var(--bg); }
@@ -33,22 +72,15 @@
         .text-muted { color: var(--muted); }
         .nav-link.active { color: var(--accent); }
 
-        /* --- Jugar con el contraste: banda oscura destacada --- */
-        .band-dark { background-color: #0A0E17; position: relative; }
-        .band-dark .eyebrow { color: #7CA3FF; }
-        .band-dark h2 { color: #F1F5F9 !important; }
-        .band-dark .bg-card { background-color: #121826; }
-        .band-dark .border-card { border-color: #23304A; }
-        .band-dark .text-slate-800 { color: #E2E8F0 !important; }
-        .band-dark .text-muted { color: #94A3B8; }
-        .band-dark .skill-icon-bg { background-color: rgba(255,255,255,0.06) !important; }
-        .band-dark .skill-icon-text { color: #7689A6; }
-
-        /* Profundidad de tarjetas sobre fondo blanco (contraste suave) */
+        /* Profundidad de tarjetas (cambia con el tema) */
         #projects .project-trigger,
         #contact .bg-card {
-            box-shadow: 0 22px 48px -30px rgba(2, 6, 23, 0.40);
+            box-shadow: var(--card-shadow);
         }
+
+        #header { background-color: var(--header-bg); }
+        .nav-link:hover { color: var(--text); }
+        #theme-toggle:hover { color: var(--accent); }
 
         /* Canvas de animación 3D de fondo global (detrás de todo el contenido) */
         #bg-canvas-3d {
@@ -92,8 +124,8 @@
         .btn:hover { transform: translateY(-2px); }
         .btn-primary { background-color: var(--accent); color: #FFFFFF; }
         .btn-primary:hover { background-color: #1D4ED8; }
-        .btn-secondary { border: 1px solid rgba(15,23,42,0.18); color: var(--text); }
-        .btn-secondary:hover { border-color: var(--accent); background-color: rgba(37,99,235,0.06); }
+        .btn-secondary { border: 1px solid var(--btn-sec-border); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--accent); background-color: rgba(91,140,255,0.08); }
 
         /* Glow sutil y profundo para el hero */
         #hero-background {
@@ -119,7 +151,7 @@
             inset: 0;
             z-index: 0;
             pointer-events: none;
-            background: radial-gradient(440px circle at var(--mx, 30%) var(--my, 40%), rgba(91, 140, 255, 0.16), transparent 62%);
+            background: radial-gradient(440px circle at var(--mx, 30%) var(--my, 40%), var(--spotlight), transparent 62%);
             transition: opacity 0.4s ease;
         }
 
@@ -144,16 +176,16 @@
 
         /* Cada palabra usa un tratamiento tipográfico distinto */
         .style-gradient {
-            background: linear-gradient(92deg, #2563EB, #0891B2 75%);
+            background: linear-gradient(92deg, var(--accent), #22d3ee 78%);
             -webkit-background-clip: text; background-clip: text; color: transparent;
         }
-        .style-solid   { color: #0F172A; }
+        .style-solid   { color: var(--text); }
         .style-outline {
             color: transparent;
-            -webkit-text-stroke: 2px #2563EB;
+            -webkit-text-stroke: 2px var(--accent);
         }
-        .style-italic  { font-style: italic; font-weight: 600; color: #475569; }
-        .style-glow    { color: #2563EB; text-shadow: 0 0 26px rgba(37, 99, 235, 0.35); }
+        .style-italic  { font-style: italic; font-weight: 600; color: var(--muted); }
+        .style-glow    { color: var(--accent); text-shadow: 0 0 26px rgba(91, 140, 255, 0.45); }
 
         @media (prefers-reduced-motion: reduce) {
             #hero-rotator, #hero-parallax { transition: none !important; transform: none !important; }
@@ -173,22 +205,22 @@
             white-space: pre;
             overflow-x: auto;
             min-height: 17.5rem;
-            color: #334155;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.85);
+            color: var(--code-text);
+            text-shadow: 0 1px 2px var(--code-shadow);
         }
         .code-caret {
             display: inline-block; width: 8px; height: 1.05em; transform: translateY(2px);
-            background: #2563EB; margin-left: 2px;
+            background: var(--accent); margin-left: 2px;
             animation: blink 1s step-end infinite;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        .tok-kw   { color: #9333ea; }
-        .tok-var  { color: #2563eb; }
-        .tok-prop { color: #0e7490; }
-        .tok-str  { color: #15803d; }
-        .tok-punc { color: #0891b2; }
-        .tok-fn   { color: #b45309; }
-        .tok-num  { color: #c2410c; }
+        .tok-kw   { color: var(--tok-kw); }
+        .tok-var  { color: var(--tok-var); }
+        .tok-prop { color: var(--tok-prop); }
+        .tok-str  { color: var(--tok-str); }
+        .tok-punc { color: var(--tok-punc); }
+        .tok-fn   { color: var(--tok-fn); }
+        .tok-num  { color: var(--tok-num); }
 
         /* --- Scrollytelling: animaciones de scroll fluidas --- */
         .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale {
@@ -248,7 +280,7 @@
         .swiper-button-next:after, .swiper-button-prev:after { font-weight: 800; }
 
         /* Íconos de habilidades */
-        .skill-icon-bg { transition: background-color 0.3s ease; }
+        .skill-icon-bg { background-color: var(--icon-bg); transition: background-color 0.3s ease; }
         .skill-icon-text { transition: color 0.3s ease; }
         .skill-card:hover .skill-icon-bg { background-color: var(--hover-color); }
         .skill-card:hover .skill-icon-text { color: white; }
@@ -267,19 +299,22 @@
     <canvas id="bg-canvas-3d"></canvas>
 
     <!-- Header / Barra de Navegación -->
-    <header id="header" class="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-card">
+    <header id="header" class="sticky top-0 z-50 backdrop-blur-xl border-b border-card">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
-                <div class="text-xl font-bold text-slate-900 tracking-tight"><a href="#home">Alex Andrade</a></div>
+                <div class="text-xl font-bold text-strong tracking-tight"><a href="#home">Alex Andrade</a></div>
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_home">Inicio</a>
-                    <a href="#about" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_about">Sobre Mí</a>
-                    <a href="#projects" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_projects">Proyectos</a>
-                    <a href="#contact" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_contact">Contacto</a>
+                    <a href="#home" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_home">Inicio</a>
+                    <a href="#about" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_about">Sobre Mí</a>
+                    <a href="#projects" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_projects">Proyectos</a>
+                    <a href="#contact" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_contact">Contacto</a>
                 </nav>
-                <div class="flex items-center bg-card p-1 rounded-full border border-card">
-                     <button id="lang-es" class="lang-btn-header px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-300">ES</button>
-                     <button id="lang-en" class="lang-btn-header px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-300">EN</button>
+                <div class="flex items-center gap-3">
+                    <button id="theme-toggle" type="button" aria-label="Cambiar tema" class="w-9 h-9 rounded-full border border-card flex items-center justify-center text-soft hover:text-accent transition-colors"></button>
+                    <div class="flex items-center bg-card p-1 rounded-full border border-card">
+                         <button id="lang-es" class="lang-btn-header px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-300">ES</button>
+                         <button id="lang-en" class="lang-btn-header px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-300">EN</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -294,7 +329,7 @@
                 <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     <div id="hero-parallax" class="max-w-2xl reveal-stagger">
                         <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Desarrollo Web Multimedia</p>
-                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-slate-900">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-strong">
                             <span class="block" data-lang="hero_title_pre">Desarrollador</span>
                             <span id="hero-rotator" class="style-gradient">Multimedia Web</span>
                         </h1>
@@ -308,7 +343,7 @@
                         <div id="code-window" class="cursor-pointer select-none" role="img" aria-label="Snippet de código que describe a Alex Andrade">
                             <div class="code-body"><code id="code-content"></code><span class="code-caret" id="code-caret"></span></div>
                         </div>
-                        <p class="text-xs text-gray-600 mt-3 text-center" data-lang="code_hint">Haz clic en el código para re-ejecutar ▶</p>
+                        <p class="text-xs text-soft mt-3 text-center" data-lang="code_hint">Haz clic en el código para re-ejecutar ▶</p>
                     </div>
                 </div>
             </div>
@@ -322,7 +357,7 @@
                 </div>
                 <div class="md:col-span-2 text-lg text-muted space-y-6 leading-relaxed">
                      <p class="eyebrow" data-lang="about_eyebrow">Perfil</p>
-                     <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900" data-lang="about_title">Sobre Mí</h2>
+                     <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-strong" data-lang="about_title">Sobre Mí</h2>
                     <p data-lang="about_p1">¡Hola! Soy Alex Andrade Hernández, desarrollador multimedia web apasionado por crear experiencias digitales interactivas.</p>
                     <p data-lang="about_p2">Soy Tecnólogo en Diseño Multimedia con formación en Ingeniería Multimedia (8 semestres). Combino desarrollo front-end con diseño y animación para construir sitios y aplicaciones web rápidas, accesibles y memorables.</p>
                     <p data-lang="about_p3">Trabajo con HTML, CSS y JavaScript moderno, frameworks como React, y animación web (GSAP, Three.js, WebGL). Me enfoco en llevar las interfaces del concepto al navegador, cuidando el rendimiento, la experiencia de usuario y el detalle visual.</p>
@@ -331,49 +366,47 @@
         </section>
 
         <!-- Sección My Skills -->
-        <section id="skills" class="band-dark py-28 md:py-40">
-            <div class="container mx-auto px-6">
+        <section id="skills" class="py-28 md:py-40 container mx-auto px-6">
              <div>
                 <div class="max-w-2xl mb-16 reveal-up">
                     <p class="eyebrow mb-3" data-lang="skills_eyebrow">Lo que hago</p>
-                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900" data-lang="skills_title">Mis Habilidades</h2>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-strong" data-lang="skills_title">Mis Habilidades</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl reveal-stagger">
                     <!-- Skill Card: HTML & CSS -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-orange-500/40 hover:-translate-y-2" style="--hover-color: #f97316;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
-                             <span class="skill-icon-text text-2xl font-extrabold text-gray-500">&lt;/&gt;</span>
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
+                             <span class="skill-icon-text text-2xl font-extrabold text-soft">&lt;/&gt;</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_ae_title">HTML5 &amp; CSS3</h3>
+                        <h3 class="text-xl font-bold text-strong mb-2" data-lang="skills_ae_title">HTML5 &amp; CSS3</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ae_desc">Maquetación semántica, responsive y accesible. Layouts modernos con Flexbox, Grid y Tailwind.</p>
                     </div>
                     <!-- Skill Card: JavaScript -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-yellow-500/40 hover:-translate-y-2" style="--hover-color: #eab308;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
-                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">JS</span>
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
+                             <span class="skill-icon-text text-3xl font-extrabold text-soft">JS</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_pr_title">JavaScript</h3>
+                        <h3 class="text-xl font-bold text-strong mb-2" data-lang="skills_pr_title">JavaScript</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_pr_desc">Interactividad y lógica del lado del cliente con JavaScript moderno (ES6+) y APIs del navegador.</p>
                     </div>
                     <!-- Skill Card: React -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-cyan-500/40 hover:-translate-y-2" style="--hover-color: #06b6d4;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
-                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">⚛</span>
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
+                             <span class="skill-icon-text text-3xl font-extrabold text-soft">⚛</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_ps_title">React &amp; Frameworks</h3>
+                        <h3 class="text-xl font-bold text-strong mb-2" data-lang="skills_ps_title">React &amp; Frameworks</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ps_desc">Aplicaciones web dinámicas con React y componentes reutilizables, escalables y mantenibles.</p>
                     </div>
                     <!-- Skill Card: Animación Web / UI-UX -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-blue-500/40 hover:-translate-y-2" style="--hover-color: #3b82f6;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
-                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">UI</span>
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
+                             <span class="skill-icon-text text-3xl font-extrabold text-soft">UI</span>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_ai_title">Animación Web &amp; UI/UX</h3>
+                        <h3 class="text-xl font-bold text-strong mb-2" data-lang="skills_ai_title">Animación Web &amp; UI/UX</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ai_desc">Interfaces y animaciones fluidas con GSAP, Three.js y WebGL para experiencias inmersivas.</p>
                     </div>
                 </div>
              </div>
-            </div>
         </section>
 
         <!-- Sección Projects con Carrusel -->
@@ -381,15 +414,15 @@
             <div class="reveal-up">
                 <div class="max-w-2xl mb-12">
                     <p class="eyebrow mb-3" data-lang="projects_eyebrow">Trabajo seleccionado</p>
-                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4" data-lang="projects_title">Proyectos</h2>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-strong mb-4" data-lang="projects_title">Proyectos</h2>
                     <p class="text-muted leading-relaxed" data-lang="projects_subtitle_carousel">Aquí hay algunas muestras de mi trabajo. Desliza para ver más y haz clic en cualquier proyecto para verlo.</p>
                 </div>
                 <div class="swiper-container max-w-6xl">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Reel" alt="Web Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de desarrollo web e interacción.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="wLsHXR-egpg"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Portfolio" alt="Portfolio Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_portfolio_title">Portafolio</h3><p class="text-muted text-sm" data-lang="projects_portfolio_desc">Una selección destacada de mis proyectos y capacidades.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+App" alt="Web App Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_motion_title">Aplicaciones Web</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Interfaces dinámicas e interactivas para web y redes sociales.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Animation" alt="Web Animation Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_vfx_title">Animación Web</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de experiencias animadas e interactivas en el navegador.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Reel" alt="Web Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de desarrollo web e interacción.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="wLsHXR-egpg"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Portfolio" alt="Portfolio Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_portfolio_title">Portafolio</h3><p class="text-muted text-sm" data-lang="projects_portfolio_desc">Una selección destacada de mis proyectos y capacidades.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+App" alt="Web App Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_motion_title">Aplicaciones Web</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Interfaces dinámicas e interactivas para web y redes sociales.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Animation" alt="Web Animation Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_vfx_title">Animación Web</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de experiencias animadas e interactivas en el navegador.</p></div></div></div>
                     </div>
                     <div class="swiper-pagination mt-8"></div>
                     <div class="swiper-button-next"></div>
@@ -402,22 +435,22 @@
         <section id="contact" class="py-28 md:py-40 container mx-auto px-6">
             <div class="reveal-up max-w-2xl">
                 <p class="eyebrow mb-3" data-lang="contact_eyebrow">Hablemos</p>
-                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4" data-lang="contact_title">Ponte en Contacto</h2>
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-strong mb-4" data-lang="contact_title">Ponte en Contacto</h2>
                 <p class="text-muted mb-12 leading-relaxed" data-lang="contact_subtitle">Puedes contactarme directamente a través de los siguientes medios:</p>
                 <div class="bg-card border border-card rounded-2xl p-8 space-y-6">
-                    <a href="mailto:alexanher8@gmail.com" class="flex items-center space-x-4 p-4 rounded-xl hover:bg-slate-100 transition-colors">
-                        <svg class="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    <a href="mailto:alexanher8@gmail.com" class="flex items-center space-x-4 p-4 rounded-xl hover-soft transition-colors">
+                        <svg class="w-7 h-7 text-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         <div class="text-left">
-                            <h3 class="font-semibold text-slate-800">Email</h3>
-                            <span class="text-lg text-blue-600">alexanher8@gmail.com</span>
+                            <h3 class="font-semibold text-strong">Email</h3>
+                            <span class="text-lg text-accent">alexanher8@gmail.com</span>
                         </div>
                     </a>
                     <div class="border-t border-card"></div>
-                    <a href="tel:+573502528104" class="flex items-center space-x-4 p-4 rounded-xl hover:bg-slate-100 transition-colors">
-                        <svg class="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                    <a href="tel:+573502528104" class="flex items-center space-x-4 p-4 rounded-xl hover-soft transition-colors">
+                        <svg class="w-7 h-7 text-soft" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                         <div class="text-left">
-                            <h3 class="font-semibold text-slate-800" data-lang="contact_phone">WhatsApp / Teléfono</h3>
-                            <span class="text-lg text-blue-600">+573502528104</span>
+                            <h3 class="font-semibold text-strong" data-lang="contact_phone">WhatsApp / Teléfono</h3>
+                            <span class="text-lg text-accent">+573502528104</span>
                         </div>
                     </a>
                 </div>
@@ -427,7 +460,7 @@
 
     <!-- Footer -->
     <footer class="border-t border-card py-8">
-        <div class="container mx-auto px-6 text-center text-gray-500 text-sm" data-lang="footer_text">&copy; 2025 Alex Andrade. Todos los derechos reservados.</div>
+        <div class="container mx-auto px-6 text-center text-soft text-sm" data-lang="footer_text">&copy; 2025 Alex Andrade. Todos los derechos reservados.</div>
     </footer>
 
     <!-- Modal para Proyectos -->
@@ -517,6 +550,26 @@
             const BASE = { r: 0.16, g: 0.38, b: 0.95 };
             const SYN  = { r: 0.02, g: 0.60, b: 0.85 };
 
+            // El tema (oscuro/claro) cambia la mezcla y el desvanecido de la red
+            let darkTheme = (document.documentElement.dataset.theme || 'dark') === 'dark';
+            function applyNeuralTheme() {
+                if (darkTheme) {
+                    lineMat.blending = THREE.AdditiveBlending;
+                    nodeMat.blending = THREE.AdditiveBlending;
+                    nodeMat.color.set(0x9bc0ff);
+                    lineMat.opacity = 0.9;
+                } else {
+                    lineMat.blending = THREE.NormalBlending;
+                    nodeMat.blending = THREE.NormalBlending;
+                    nodeMat.color.set(0x2f6bff);
+                    lineMat.opacity = 0.72;
+                }
+                lineMat.needsUpdate = true;
+                nodeMat.needsUpdate = true;
+            }
+            applyNeuralTheme();
+            window.__setNeuralTheme = function (isDark) { darkTheme = isDark; applyNeuralTheme(); };
+
             // --- Interacción con el mouse ---
             const mouseNDC = new THREE.Vector2(0, 0);
             let pointerActive = false;
@@ -576,7 +629,9 @@
                         if (d2 < C2 && seg < MAX_SEG) {
                             const a = 1 - Math.sqrt(d2) / CONNECT; // intensidad (fade)
                             // En fondo blanco, desvanecer hacia el blanco (no hacia el negro)
-                            const br = 1 - (1 - BASE.r) * a, bg = 1 - (1 - BASE.g) * a, bb = 1 - (1 - BASE.b) * a;
+                            let br, bg, bb;
+                            if (darkTheme) { br = BASE.r * a; bg = BASE.g * a; bb = BASE.b * a; }
+                            else { br = 1 - (1 - BASE.r) * a; bg = 1 - (1 - BASE.g) * a; bb = 1 - (1 - BASE.b) * a; }
                             const o = seg * 6;
                             linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
                             linePos[o + 3] = nodePos[j3]; linePos[o + 4] = nodePos[j3 + 1]; linePos[o + 5] = nodePos[j3 + 2];
@@ -595,7 +650,9 @@
                             const a = 1 - mdist / MOUSE_R;
                             // Conexión solo visual con el cursor (no mueve los nodos,
                             // así la interacción no se acumula ni los amontona).
-                            const sr = 1 - (1 - SYN.r) * a, sg = 1 - (1 - SYN.g) * a, sb = 1 - (1 - SYN.b) * a;
+                            let sr, sg, sb;
+                            if (darkTheme) { sr = SYN.r * a; sg = SYN.g * a; sb = SYN.b * a; }
+                            else { sr = 1 - (1 - SYN.r) * a; sg = 1 - (1 - SYN.g) * a; sb = 1 - (1 - SYN.b) * a; }
                             const o = seg * 6;
                             linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
                             linePos[o + 3] = mouseWorld.x; linePos[o + 4] = mouseWorld.y; linePos[o + 5] = 0;
@@ -704,6 +761,23 @@
             langEnBtn.addEventListener('click', () => setLanguage('en'));
             const savedLang = localStorage.getItem('language') || (navigator.language.startsWith('es') ? 'es' : 'en');
             setLanguage(savedLang);
+
+            // --- TEMA OSCURO / CLARO ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const ICON_SUN = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>';
+            const ICON_MOON = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+            const applyTheme = (theme) => {
+                document.documentElement.dataset.theme = theme;
+                try { localStorage.setItem('theme', theme); } catch (e) {}
+                if (themeToggle) themeToggle.innerHTML = (theme === 'dark') ? ICON_SUN : ICON_MOON;
+                if (window.__setNeuralTheme) window.__setNeuralTheme(theme === 'dark');
+            };
+            applyTheme(document.documentElement.dataset.theme || 'dark');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+                });
+            }
 
             // --- HERO: TIPOGRAFÍA CINÉTICA (la palabra cambia de diseño) ---
             const heroReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
