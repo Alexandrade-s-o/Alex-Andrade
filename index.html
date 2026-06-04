@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alex Andrade - Diseñador Multimedia</title>
+    <title>Alex Andrade - Desarrollador Multimedia Web</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
             --border: #1A2030;
         }
 
-        /* Estilo base — estilo "espacio" inspirado en Antigravity */
+        /* Estilo base — estilo "espacio / red neuronal" */
         html { background-color: var(--bg); }
         body {
             font-family: 'Inter', sans-serif;
@@ -61,7 +61,7 @@
             color: var(--accent);
         }
 
-        /* Botones tipo "pill" estilo Antigravity */
+        /* Botones tipo "pill" */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -78,7 +78,7 @@
         .btn-secondary { border: 1px solid rgba(255,255,255,0.18); color: var(--text); }
         .btn-secondary:hover { border-color: rgba(255,255,255,0.45); background-color: rgba(255,255,255,0.04); }
 
-        /* Glow sutil y profundo para el hero (sensación de espacio) */
+        /* Glow sutil y profundo para el hero */
         #hero-background {
             position: absolute;
             top: 0;
@@ -96,10 +96,9 @@
             100% { transform: translate3d(2%, -2%, 0) scale(1.06); opacity: 1; }
         }
 
-        /* Asegurar que el contenido del hero esté por encima */
         #home .container { position: relative; z-index: 1; }
 
-        /* Estilos para animaciones de scroll */
+        /* Animaciones de scroll */
         .reveal {
             opacity: 0;
             transform: translateY(30px);
@@ -107,7 +106,7 @@
         }
         .reveal.visible { opacity: 1; transform: translateY(0); }
 
-        /* Estilos para el carrusel Swiper.js */
+        /* Carrusel Swiper.js */
         .swiper-container { width: 100%; padding-top: 20px; padding-bottom: 50px; }
         .swiper-slide { display: flex; justify-content: center; }
         .swiper-pagination-bullet { background: #444; opacity: 0.7; }
@@ -156,9 +155,9 @@
             <div id="hero-background"></div>
             <div class="container mx-auto px-6 reveal">
                 <div class="max-w-4xl">
-                    <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Diseño &amp; Animación</p>
-                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.04] mb-6 text-white" data-lang="hero_title">Diseñador Multimedia</h1>
-                    <p class="text-lg md:text-xl text-muted max-w-2xl mb-10 leading-relaxed" data-lang="hero_subtitle">y soy un experto en animación con experticia en After Effects, Premiere Pro, Illustrator, Photoshop y DaVinci Resolve.</p>
+                    <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Desarrollo Web Multimedia</p>
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.04] mb-6 text-white" data-lang="hero_title">Desarrollador Multimedia Web</h1>
+                    <p class="text-lg md:text-xl text-muted max-w-2xl mb-10 leading-relaxed" data-lang="hero_subtitle">Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.</p>
                     <div class="flex flex-wrap gap-4">
                         <a href="#projects" class="btn btn-primary" data-lang="hero_btn_projects">Ver Mis Proyectos</a>
                         <a href="#contact" class="btn btn-secondary" data-lang="hero_btn_contact">Contáctame</a>
@@ -176,9 +175,9 @@
                 <div class="md:col-span-2 text-lg text-muted space-y-6 leading-relaxed">
                      <p class="eyebrow" data-lang="about_eyebrow">Perfil</p>
                      <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-white" data-lang="about_title">Sobre Mí</h2>
-                    <p data-lang="about_p1">¡Hola! Soy Alex Andrade Hernández, un apasionado diseñador multimedia y experto en animación.</p>
-                    <p data-lang="about_p2">Soy Tecnólogo en Diseño Multimedia y he completado 8 semestres de Ingeniería Multimedia. Mi enfoque es transformar ideas creativas en experiencias digitales impactantes, especializándome en dar vida a conceptos visuales a través de la animación y el diseño.</p>
-                    <p data-lang="about_p3">Con una sólida trayectoria utilizando herramientas como After Effects, Premiere Pro, Illustrator, Photoshop y DaVinci Resolve, me dedico a producir contenido visual de alta calidad que no solo cautiva, sino que también comunica eficazmente. Me inspira la innovación y busco constantemente superar los límites creativos en cada proyecto.</p>
+                    <p data-lang="about_p1">¡Hola! Soy Alex Andrade Hernández, desarrollador multimedia web apasionado por crear experiencias digitales interactivas.</p>
+                    <p data-lang="about_p2">Soy Tecnólogo en Diseño Multimedia con formación en Ingeniería Multimedia (8 semestres). Combino desarrollo front-end con diseño y animación para construir sitios y aplicaciones web rápidas, accesibles y memorables.</p>
+                    <p data-lang="about_p3">Trabajo con HTML, CSS y JavaScript moderno, frameworks como React, y animación web (GSAP, Three.js, WebGL). Me enfoco en llevar las interfaces del concepto al navegador, cuidando el rendimiento, la experiencia de usuario y el detalle visual.</p>
                 </div>
             </div>
         </section>
@@ -191,37 +190,37 @@
                     <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-white" data-lang="skills_title">Mis Habilidades</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl">
-                    <!-- Skill Card: After Effects -->
-                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-purple-500/40 hover:-translate-y-2" style="--hover-color: #a855f7;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
-                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">Ae</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ae_title">After Effects</h3>
-                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_ae_desc">Animaciones fluidas y gráficos en movimiento dinámicos para dar vida a tus ideas.</p>
-                    </div>
-                    <!-- Skill Card: Premiere Pro -->
-                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-indigo-500/40 hover:-translate-y-2" style="--hover-color: #6366f1;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
-                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">Pr</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_pr_title">Premiere Pro</h3>
-                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_pr_desc">Edición y montaje de video profesional. Experiencia también con DaVinci Resolve.</p>
-                    </div>
-                    <!-- Skill Card: Photoshop -->
-                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-blue-500/40 hover:-translate-y-2" style="--hover-color: #3b82f6;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
-                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">Ps</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ps_title">Photoshop</h3>
-                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_ps_desc">Retoque fotográfico avanzado, composición de imágenes y diseño digital.</p>
-                    </div>
-                    <!-- Skill Card: Illustrator -->
+                    <!-- Skill Card: HTML & CSS -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-orange-500/40 hover:-translate-y-2" style="--hover-color: #f97316;">
                         <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
-                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">Ai</span>
+                             <span class="skill-icon-text text-2xl font-extrabold text-gray-500">&lt;/&gt;</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ai_title">Illustrator</h3>
-                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_ai_desc">Diseño de logos, ilustraciones vectoriales y gráficos escalables.</p>
+                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ae_title">HTML5 &amp; CSS3</h3>
+                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_ae_desc">Maquetación semántica, responsive y accesible. Layouts modernos con Flexbox, Grid y Tailwind.</p>
+                    </div>
+                    <!-- Skill Card: JavaScript -->
+                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-yellow-500/40 hover:-translate-y-2" style="--hover-color: #eab308;">
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
+                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">JS</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_pr_title">JavaScript</h3>
+                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_pr_desc">Interactividad y lógica del lado del cliente con JavaScript moderno (ES6+) y APIs del navegador.</p>
+                    </div>
+                    <!-- Skill Card: React -->
+                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-cyan-500/40 hover:-translate-y-2" style="--hover-color: #06b6d4;">
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
+                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">⚛</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ps_title">React &amp; Frameworks</h3>
+                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_ps_desc">Aplicaciones web dinámicas con React y componentes reutilizables, escalables y mantenibles.</p>
+                    </div>
+                    <!-- Skill Card: Animación Web / UI-UX -->
+                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-blue-500/40 hover:-translate-y-2" style="--hover-color: #3b82f6;">
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
+                             <span class="skill-icon-text text-3xl font-extrabold text-gray-500">UI</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ai_title">Animación Web &amp; UI/UX</h3>
+                        <p class="text-muted text-sm leading-relaxed" data-lang="skills_ai_desc">Interfaces y animaciones fluidas con GSAP, Three.js y WebGL para experiencias inmersivas.</p>
                     </div>
                 </div>
              </div>
@@ -237,10 +236,10 @@
                 </div>
                 <div class="swiper-container max-w-6xl">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Project+Reel" alt="Project Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de animación y edición.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Web+Reel" alt="Web Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de desarrollo web e interacción.</p></div></div></div>
                         <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="wLsHXR-egpg"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Portfolio" alt="Portfolio Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_portfolio_title">Portafolio</h3><p class="text-muted text-sm" data-lang="projects_portfolio_desc">Una selección destacada de mis proyectos y capacidades.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Motion+Graphics" alt="Motion Graphics Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_motion_title">Gráficos en Movimiento</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Gráficos dinámicos para marcas y redes sociales.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=VFX+Showcase" alt="VFX Showcase Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_vfx_title">Muestra de VFX</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de trabajos de efectos visuales y composición.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Web+App" alt="Web App Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_motion_title">Aplicaciones Web</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Interfaces dinámicas e interactivas para web y redes sociales.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Web+Animation" alt="Web Animation Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_vfx_title">Animación Web</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de experiencias animadas e interactivas en el navegador.</p></div></div></div>
                     </div>
                     <div class="swiper-pagination mt-8"></div>
                     <div class="swiper-button-next"></div>
@@ -294,10 +293,11 @@
     <!-- Three.js para la animación 3D de fondo (copia local, sin depender de CDN) -->
     <script src="vendor/three.min.js"></script>
     <script>
-        // --- ANIMACIÓN 3D DE FONDO GLOBAL (estilo Antigravity) ---
-        // Campo de "dashes" (rayitas) azules flotando en el espacio. Reactivo al mouse:
-        // las rayitas se apartan del cursor y la cámara hace un parallax sutil.
-        (function init3DBackground() {
+        // --- RED NEURONAL DE FONDO (Three.js) ---
+        // Nodos flotando en el espacio, conectados por líneas cuando están cerca.
+        // Reactivo al mouse: el cursor actúa como un nodo que atrae e ilumina las
+        // conexiones cercanas, como una sinapsis.
+        (function initNeuralBackground() {
             const canvas = document.getElementById('bg-canvas-3d');
             if (!canvas || typeof THREE === 'undefined') return;
 
@@ -305,7 +305,7 @@
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 70;
+            camera.position.z = 90;
 
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             renderer.setClearColor(0x000000, 0);
@@ -313,58 +313,65 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
 
             // Volumen del campo
-            const RX = 130, RY = 95, RZ = 60;
+            const RX = 170, RY = 110, RZ = 70;
+            const NODES = 130;
+            const CONNECT = 26;     // distancia máxima para conectar dos nodos
+            const MOUSE_R = 52;     // radio de influencia del cursor
 
-            // "Dash" = plano fino. Usamos InstancedMesh por rendimiento.
-            const COUNT = 340;
-            const geo = new THREE.PlaneGeometry(2.2, 0.22);
-            const mat = new THREE.MeshBasicMaterial({
-                transparent: true,
-                opacity: 0.95,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false,
-                side: THREE.DoubleSide
-            });
-            const mesh = new THREE.InstancedMesh(geo, mat, COUNT);
-            mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-            scene.add(mesh);
-
-            const palette = [
-                new THREE.Color(0x3b6dff),
-                new THREE.Color(0x5b8cff),
-                new THREE.Color(0x22a7ff),
-                new THREE.Color(0x86b0ff)
-            ];
-            const tmpColor = new THREE.Color();
-            const dummy = new THREE.Object3D();
-            const dashes = [];
-
-            for (let i = 0; i < COUNT; i++) {
-                const z = (Math.random() - 0.5) * RZ;
-                const d = {
-                    x: (Math.random() - 0.5) * RX,
-                    y: (Math.random() - 0.5) * RY,
-                    z: z,
-                    rot: Math.random() * Math.PI,
-                    rotSpeed: (Math.random() - 0.5) * 0.05,
-                    drift: 1.2 + Math.random() * 2.4,   // velocidad de ascenso
-                    sway: Math.random() * Math.PI * 2,
-                    swayAmp: 0.3 + Math.random() * 1.0,
-                    scale: 0.45 + Math.random() * 1.15
-                };
-                dashes.push(d);
-                // Color con atenuación por profundidad (sensación de espacio)
-                const depth = 0.4 + 0.6 * ((z + RZ / 2) / RZ);
-                tmpColor.copy(palette[(Math.random() * palette.length) | 0]).multiplyScalar(depth);
-                mesh.setColorAt(i, tmpColor);
+            // Posiciones y velocidades de los nodos
+            const nodePos = new Float32Array(NODES * 3);
+            const nodeVel = new Float32Array(NODES * 3);
+            for (let i = 0; i < NODES; i++) {
+                const i3 = i * 3;
+                nodePos[i3]     = (Math.random() - 0.5) * RX;
+                nodePos[i3 + 1] = (Math.random() - 0.5) * RY;
+                nodePos[i3 + 2] = (Math.random() - 0.5) * RZ;
+                nodeVel[i3]     = (Math.random() - 0.5) * 6;
+                nodeVel[i3 + 1] = (Math.random() - 0.5) * 6;
+                nodeVel[i3 + 2] = (Math.random() - 0.5) * 4;
             }
-            if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+
+            // Nodos (puntos)
+            const nodeGeo = new THREE.BufferGeometry();
+            nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodePos, 3));
+            const nodeMat = new THREE.PointsMaterial({
+                color: 0x9bc0ff,
+                size: 2.2,
+                sizeAttenuation: true,
+                transparent: true,
+                opacity: 0.9,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            const nodePoints = new THREE.Points(nodeGeo, nodeMat);
+            scene.add(nodePoints);
+
+            // Líneas (conexiones) — buffer preasignado
+            const MAX_SEG = NODES * 16;
+            const linePos = new Float32Array(MAX_SEG * 6);
+            const lineCol = new Float32Array(MAX_SEG * 6);
+            const lineGeo = new THREE.BufferGeometry();
+            lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
+            lineGeo.setAttribute('color', new THREE.BufferAttribute(lineCol, 3));
+            const lineMat = new THREE.LineBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+            const lines = new THREE.LineSegments(lineGeo, lineMat);
+            scene.add(lines);
+
+            // Colores base (azul) y de sinapsis con el mouse (cian brillante)
+            const BASE = { r: 0.23, g: 0.42, b: 1.0 };
+            const SYN  = { r: 0.45, g: 0.85, b: 1.0 };
 
             // --- Interacción con el mouse ---
             const mouseNDC = new THREE.Vector2(0, 0);
             let pointerActive = false;
             const targetWorld = new THREE.Vector3();
-            const mouseWorld = new THREE.Vector3(9999, 9999, 0);
+            const mouseWorld = new THREE.Vector3(0, 0, 0);
             const raycaster = new THREE.Raycaster();
             const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
@@ -375,59 +382,81 @@
             });
             window.addEventListener('pointerleave', () => { pointerActive = false; });
 
-            const REPEL_R = 28, REPEL_F = 16;
             const clock = new THREE.Clock();
 
             function frame() {
                 const dt = Math.min(clock.getDelta(), 0.05);
-                const t = clock.elapsedTime;
 
+                // Mover nodos con rebote en los límites del volumen
+                for (let i = 0; i < NODES; i++) {
+                    const i3 = i * 3;
+                    nodePos[i3]     += nodeVel[i3] * dt;
+                    nodePos[i3 + 1] += nodeVel[i3 + 1] * dt;
+                    nodePos[i3 + 2] += nodeVel[i3 + 2] * dt;
+                    if (nodePos[i3]     >  RX / 2 || nodePos[i3]     < -RX / 2) nodeVel[i3]     *= -1;
+                    if (nodePos[i3 + 1] >  RY / 2 || nodePos[i3 + 1] < -RY / 2) nodeVel[i3 + 1] *= -1;
+                    if (nodePos[i3 + 2] >  RZ / 2 || nodePos[i3 + 2] < -RZ / 2) nodeVel[i3 + 2] *= -1;
+                }
+
+                // Posición del cursor en el mundo
                 if (pointerActive) {
                     raycaster.setFromCamera(mouseNDC, camera);
                     raycaster.ray.intersectPlane(plane, targetWorld);
-                    mouseWorld.lerp(targetWorld, 0.18);
+                    mouseWorld.lerp(targetWorld, 0.2);
                 }
 
-                for (let i = 0; i < COUNT; i++) {
-                    const d = dashes[i];
-                    d.y += d.drift * dt * 6;
-                    if (d.y > RY / 2 + 6) {
-                        d.y = -RY / 2 - 6;
-                        d.x = (Math.random() - 0.5) * RX;
-                        d.z = (Math.random() - 0.5) * RZ;
-                    }
-                    d.rot += d.rotSpeed * dt;
+                // Construir conexiones
+                let seg = 0;
+                const C2 = CONNECT * CONNECT;
+                for (let i = 0; i < NODES; i++) {
+                    const i3 = i * 3;
+                    const ax = nodePos[i3], ay = nodePos[i3 + 1], az = nodePos[i3 + 2];
 
-                    let px = d.x + Math.sin(t * 0.3 + d.sway) * d.swayAmp;
-                    let py = d.y;
-                    let extraRot = 0;
-                    let boost = 1;
-
-                    if (pointerActive) {
-                        const dx = px - mouseWorld.x;
-                        const dy = py - mouseWorld.y;
-                        const dist = Math.hypot(dx, dy);
-                        if (dist < REPEL_R) {
-                            const f = 1 - dist / REPEL_R;
-                            const inv = 1 / (dist || 0.001);
-                            px += dx * inv * f * REPEL_F;
-                            py += dy * inv * f * REPEL_F;
-                            extraRot = Math.atan2(dy, dx) * f * 0.7;
-                            boost = 1 + f * 0.9;
+                    for (let j = i + 1; j < NODES; j++) {
+                        const j3 = j * 3;
+                        const dx = ax - nodePos[j3];
+                        const dy = ay - nodePos[j3 + 1];
+                        const dz = az - nodePos[j3 + 2];
+                        const d2 = dx * dx + dy * dy + dz * dz;
+                        if (d2 < C2 && seg < MAX_SEG) {
+                            const a = 1 - Math.sqrt(d2) / CONNECT; // intensidad (fade)
+                            const o = seg * 6;
+                            linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
+                            linePos[o + 3] = nodePos[j3]; linePos[o + 4] = nodePos[j3 + 1]; linePos[o + 5] = nodePos[j3 + 2];
+                            lineCol[o]     = BASE.r * a; lineCol[o + 1] = BASE.g * a; lineCol[o + 2] = BASE.b * a;
+                            lineCol[o + 3] = BASE.r * a; lineCol[o + 4] = BASE.g * a; lineCol[o + 5] = BASE.b * a;
+                            seg++;
                         }
                     }
 
-                    dummy.position.set(px, py, d.z);
-                    dummy.rotation.set(0, 0, d.rot + extraRot);
-                    dummy.scale.set(d.scale * boost, d.scale * boost, 1);
-                    dummy.updateMatrix();
-                    mesh.setMatrixAt(i, dummy.matrix);
+                    // Sinapsis con el cursor: conecta y atrae nodos cercanos
+                    if (pointerActive) {
+                        const mdx = ax - mouseWorld.x;
+                        const mdy = ay - mouseWorld.y;
+                        const mdist = Math.hypot(mdx, mdy);
+                        if (mdist < MOUSE_R && seg < MAX_SEG) {
+                            const a = 1 - mdist / MOUSE_R;
+                            // atracción suave hacia el cursor
+                            nodePos[i3]     -= mdx * a * 0.04;
+                            nodePos[i3 + 1] -= mdy * a * 0.04;
+                            const o = seg * 6;
+                            linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
+                            linePos[o + 3] = mouseWorld.x; linePos[o + 4] = mouseWorld.y; linePos[o + 5] = 0;
+                            lineCol[o]     = SYN.r * a; lineCol[o + 1] = SYN.g * a; lineCol[o + 2] = SYN.b * a;
+                            lineCol[o + 3] = SYN.r * a; lineCol[o + 4] = SYN.g * a; lineCol[o + 5] = SYN.b * a;
+                            seg++;
+                        }
+                    }
                 }
-                mesh.instanceMatrix.needsUpdate = true;
+
+                nodeGeo.attributes.position.needsUpdate = true;
+                lineGeo.attributes.position.needsUpdate = true;
+                lineGeo.attributes.color.needsUpdate = true;
+                lineGeo.setDrawRange(0, seg * 2);
 
                 // Parallax sutil de cámara
-                const camTargetX = pointerActive ? mouseNDC.x * 8 : 0;
-                const camTargetY = pointerActive ? mouseNDC.y * 8 : 0;
+                const camTargetX = pointerActive ? mouseNDC.x * 10 : 0;
+                const camTargetY = pointerActive ? mouseNDC.y * 10 : 0;
                 camera.position.x += (camTargetX - camera.position.x) * 0.03;
                 camera.position.y += (camTargetY - camera.position.y) * 0.03;
                 camera.lookAt(0, 0, 0);
@@ -436,7 +465,7 @@
                 if (!reduceMotion) requestAnimationFrame(frame);
             }
 
-            frame(); // si reduceMotion, queda en un solo frame estático
+            frame();
 
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -454,39 +483,39 @@
             const translations = {
                 es: {
                     nav_home: "Inicio", nav_about: "Sobre Mí", nav_projects: "Proyectos", nav_contact: "Contacto",
-                    hero_eyebrow: "Alex Andrade — Diseño &amp; Animación",
-                    hero_title: "Diseñador Multimedia", hero_subtitle: "y soy un experto en animación con experticia en After Effects, Premiere Pro, Illustrator, Photoshop y DaVinci Resolve.",
+                    hero_eyebrow: "Alex Andrade — Desarrollo Web Multimedia",
+                    hero_title: "Desarrollador Multimedia Web", hero_subtitle: "Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.",
                     hero_btn_projects: "Ver Mis Proyectos", hero_btn_contact: "Contáctame",
                     about_eyebrow: "Perfil",
-                    about_title: "Sobre Mí", about_p1: "¡Hola! Soy Alex Andrade Hernández, un apasionado diseñador multimedia y experto en animación.", about_p2: "Soy Tecnólogo en Diseño Multimedia y he completado 8 semestres de Ingeniería Multimedia. Mi enfoque es transformar ideas creativas en experiencias digitales impactantes, especializándome en dar vida a conceptos visuales a través de la animación y el diseño.", about_p3: "Con una sólida trayectoria utilizando herramientas como After Effects, Premiere Pro, Illustrator, Photoshop y DaVinci Resolve, me dedico a producir contenido visual de alta calidad que no solo cautiva, sino que también comunica eficazmente. Me inspira la innovación y busco constantemente superar los límites creativos en cada proyecto.",
+                    about_title: "Sobre Mí", about_p1: "¡Hola! Soy Alex Andrade Hernández, desarrollador multimedia web apasionado por crear experiencias digitales interactivas.", about_p2: "Soy Tecnólogo en Diseño Multimedia con formación en Ingeniería Multimedia (8 semestres). Combino desarrollo front-end con diseño y animación para construir sitios y aplicaciones web rápidas, accesibles y memorables.", about_p3: "Trabajo con HTML, CSS y JavaScript moderno, frameworks como React, y animación web (GSAP, Three.js, WebGL). Me enfoco en llevar las interfaces del concepto al navegador, cuidando el rendimiento, la experiencia de usuario y el detalle visual.",
                     skills_eyebrow: "Lo que hago",
-                    skills_title: "Mis Habilidades", skills_ae_title: "After Effects", skills_ae_desc: "Animaciones fluidas y gráficos en movimiento dinámicos para dar vida a tus ideas.", skills_pr_title: "Premiere Pro", skills_pr_desc: "Edición y montaje de video profesional. Experiencia también con DaVinci Resolve.", skills_ps_title: "Photoshop", skills_ps_desc: "Retoque fotográfico avanzado, composición de imágenes y diseño digital.", skills_ai_title: "Illustrator", skills_ai_desc: "Diseño de logos, ilustraciones vectoriales y gráficos escalables.",
+                    skills_title: "Mis Habilidades", skills_ae_title: "HTML5 &amp; CSS3", skills_ae_desc: "Maquetación semántica, responsive y accesible. Layouts modernos con Flexbox, Grid y Tailwind.", skills_pr_title: "JavaScript", skills_pr_desc: "Interactividad y lógica del lado del cliente con JavaScript moderno (ES6+) y APIs del navegador.", skills_ps_title: "React &amp; Frameworks", skills_ps_desc: "Aplicaciones web dinámicas con React y componentes reutilizables, escalables y mantenibles.", skills_ai_title: "Animación Web &amp; UI/UX", skills_ai_desc: "Interfaces y animaciones fluidas con GSAP, Three.js y WebGL para experiencias inmersivas.",
                     projects_eyebrow: "Trabajo seleccionado",
                     projects_title: "Proyectos", projects_subtitle_carousel: "Aquí hay algunas muestras de mi trabajo. Desliza para ver más y haz clic en cualquier proyecto para verlo.",
-                    projects_reel_title: "Reel de Proyectos", projects_reel_desc: "Una muestra de diversos trabajos de animación y edición.",
+                    projects_reel_title: "Reel de Proyectos", projects_reel_desc: "Una muestra de diversos trabajos de desarrollo web e interacción.",
                     projects_portfolio_title: "Portafolio", projects_portfolio_desc: "Una selección destacada de mis proyectos y capacidades.",
-                    projects_motion_title: "Gráficos en Movimiento", projects_motion_desc: "Gráficos dinámicos para marcas y redes sociales.",
-                    projects_vfx_title: "Muestra de VFX", projects_vfx_desc: "Una colección de trabajos de efectos visuales y composición.",
+                    projects_motion_title: "Aplicaciones Web", projects_motion_desc: "Interfaces dinámicas e interactivas para web y redes sociales.",
+                    projects_vfx_title: "Animación Web", projects_vfx_desc: "Una colección de experiencias animadas e interactivas en el navegador.",
                     contact_eyebrow: "Hablemos",
                     contact_title: "Ponte en Contacto", contact_subtitle: "Puedes contactarme directamente a través de los siguientes medios:", contact_phone: "WhatsApp / Teléfono",
                     footer_text: "© 2025 Alex Andrade. Todos los derechos reservados."
                 },
                 en: {
                     nav_home: "Home", nav_about: "About Me", nav_projects: "Projects", nav_contact: "Contact",
-                    hero_eyebrow: "Alex Andrade — Design &amp; Animation",
-                    hero_title: "Multimedia Designer", hero_subtitle: "and I am an animation expert with expertise in After Effects, Premiere Pro, Illustrator, Photoshop, and DaVinci Resolve.",
+                    hero_eyebrow: "Alex Andrade — Multimedia Web Development",
+                    hero_title: "Multimedia Web Developer", hero_subtitle: "I build interactive, immersive web experiences — blending code, design and animation to craft interfaces that communicate and captivate.",
                     hero_btn_projects: "View My Projects", hero_btn_contact: "Contact Me",
                     about_eyebrow: "Profile",
-                    about_title: "About Me", about_p1: "Hello! I am Alex Andrade Hernández, a passionate multimedia designer and animation expert.", about_p2: "I am a Multimedia Design Technologist and have completed 8 semesters of Multimedia Engineering. My focus is on transforming creative ideas into impactful digital experiences, specializing in bringing visual concepts to life through animation and design.", about_p3: "With a strong track record using tools like After Effects, Premiere Pro, Illustrator, Photoshop, and DaVinci Resolve, I am dedicated to producing high-quality visual content that not only captivates but also communicates effectively. I am inspired by innovation and constantly seek to push creative boundaries in every project.",
+                    about_title: "About Me", about_p1: "Hello! I am Alex Andrade Hernández, a multimedia web developer passionate about building interactive digital experiences.", about_p2: "I am a Multimedia Design Technologist with training in Multimedia Engineering (8 semesters). I blend front-end development with design and animation to build fast, accessible and memorable websites and web apps.", about_p3: "I work with modern HTML, CSS and JavaScript, frameworks like React, and web animation (GSAP, Three.js, WebGL). I focus on taking interfaces from concept to the browser, caring about performance, user experience and visual detail.",
                     skills_eyebrow: "What I do",
-                    skills_title: "My Skills", skills_ae_title: "After Effects", skills_ae_desc: "Fluid animations and dynamic motion graphics to bring your ideas to life.", skills_pr_title: "Premiere Pro", skills_pr_desc: "Professional video editing and assembly. Experience also with DaVinci Resolve.",
-                    skills_ps_title: "Photoshop", skills_ps_desc: "Advanced photo retouching, image composition, and digital design.", skills_ai_title: "Illustrator", skills_ai_desc: "Logo design, vector illustrations, and scalable graphics.",
+                    skills_title: "My Skills", skills_ae_title: "HTML5 &amp; CSS3", skills_ae_desc: "Semantic, responsive and accessible markup. Modern layouts with Flexbox, Grid and Tailwind.", skills_pr_title: "JavaScript", skills_pr_desc: "Client-side interactivity and logic with modern JavaScript (ES6+) and browser APIs.",
+                    skills_ps_title: "React &amp; Frameworks", skills_ps_desc: "Dynamic web apps with React and reusable, scalable, maintainable components.", skills_ai_title: "Web Animation &amp; UI/UX", skills_ai_desc: "Fluid interfaces and animations with GSAP, Three.js and WebGL for immersive experiences.",
                     projects_eyebrow: "Selected work",
                     projects_title: "Projects", projects_subtitle_carousel: "Here are some samples of my work. Swipe to see more and click on any project to watch.",
-                    projects_reel_title: "Project Reel", projects_reel_desc: "A showcase of diverse animation and editing work.",
+                    projects_reel_title: "Project Reel", projects_reel_desc: "A showcase of diverse web development and interaction work.",
                     projects_portfolio_title: "Portfolio", projects_portfolio_desc: "A highlighted selection of my projects and capabilities.",
-                    projects_motion_title: "Motion Graphics", projects_motion_desc: "Dynamic motion graphics for brands and social media.",
-                    projects_vfx_title: "VFX Showcase", projects_vfx_desc: "A collection of visual effects and compositing work.",
+                    projects_motion_title: "Web Apps", projects_motion_desc: "Dynamic, interactive interfaces for the web and social media.",
+                    projects_vfx_title: "Web Animation", projects_vfx_desc: "A collection of animated, interactive experiences in the browser.",
                     contact_eyebrow: "Let's talk",
                     contact_title: "Get In Touch", contact_subtitle: "You can reach me directly via the following means:", contact_phone: "WhatsApp / Phone",
                     footer_text: "© 2025 Alex Andrade. All rights reserved."
