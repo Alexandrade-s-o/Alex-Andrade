@@ -12,10 +12,23 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <style>
         /* Estilo base y paleta de colores profesional */
+        html { background-color: #0A0E14; }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0A0E14;
+            background-color: transparent;
             color: #C9D1D9;
+        }
+
+        /* Canvas de animación 3D de fondo global (detrás de todo el contenido) */
+        #bg-canvas-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            display: block;
         }
         .bg-card { background-color: #161B22; }
         .border-card { border-color: #21262D; }
@@ -104,6 +117,9 @@
     </style>
 </head>
 <body class="antialiased">
+
+    <!-- Canvas de animación 3D de fondo (Three.js) -->
+    <canvas id="bg-canvas-3d"></canvas>
 
     <!-- Header / Barra de Navegación -->
     <header id="header" class="sticky top-0 z-50 bg-opacity-70 backdrop-blur-xl bg-[#0A0E14]/70 border-b border-card">
@@ -254,6 +270,123 @@
         </div>
     </div>
 
+
+    <!-- Three.js para la animación 3D de fondo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // --- ANIMACIÓN 3D DE FONDO GLOBAL ---
+        // Campo de partículas flotantes en los colores de marca. No afecta al hero,
+        // que mantiene su propio gradiente aurora por encima de este canvas.
+        (function init3DBackground() {
+            const canvas = document.getElementById('bg-canvas-3d');
+            if (!canvas || typeof THREE === 'undefined') return;
+
+            // Respetar preferencia de movimiento reducido por accesibilidad.
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 60;
+
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setClearColor(0x000000, 0);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // Grupo de partículas
+            const PARTICLE_COUNT = 900;
+            const positions = new Float32Array(PARTICLE_COUNT * 3);
+            const colors = new Float32Array(PARTICLE_COUNT * 3);
+            const colorA = new THREE.Color(0x3b82f6); // azul de marca
+            const colorB = new THREE.Color(0x0d9488); // teal de marca
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const i3 = i * 3;
+                positions[i3]     = (Math.random() - 0.5) * 160;
+                positions[i3 + 1] = (Math.random() - 0.5) * 120;
+                positions[i3 + 2] = (Math.random() - 0.5) * 120;
+                const c = Math.random() > 0.5 ? colorA : colorB;
+                colors[i3] = c.r; colors[i3 + 1] = c.g; colors[i3 + 2] = c.b;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.9,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            const points = new THREE.Points(geometry, material);
+            scene.add(points);
+
+            // Figuras geométricas alámbricas flotantes
+            const shapes = [];
+            const shapeGeos = [
+                new THREE.IcosahedronGeometry(8, 0),
+                new THREE.OctahedronGeometry(6, 0),
+                new THREE.TorusGeometry(6, 1.6, 8, 24)
+            ];
+            shapeGeos.forEach((geo, idx) => {
+                const mat = new THREE.MeshBasicMaterial({
+                    color: idx % 2 === 0 ? 0x3b82f6 : 0x0d9488,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.25
+                });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set((idx - 1) * 40, (idx % 2 === 0 ? 20 : -20), -20);
+                scene.add(mesh);
+                shapes.push(mesh);
+            });
+
+            // Parallax suave con el mouse
+            let mouseX = 0, mouseY = 0;
+            window.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5);
+                mouseY = (e.clientY / window.innerHeight - 0.5);
+            });
+
+            const clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+                const t = clock.getElapsedTime();
+
+                points.rotation.y = t * 0.03;
+                points.rotation.x = t * 0.01;
+
+                shapes.forEach((m, i) => {
+                    m.rotation.x = t * (0.1 + i * 0.04);
+                    m.rotation.y = t * (0.12 + i * 0.03);
+                    m.position.y += Math.sin(t + i) * 0.01;
+                });
+
+                // Cámara con parallax sutil
+                camera.position.x += (mouseX * 12 - camera.position.x) * 0.03;
+                camera.position.y += (-mouseY * 12 - camera.position.y) * 0.03;
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+            }
+
+            if (!reduceMotion) {
+                animate();
+            } else {
+                renderer.render(scene, camera); // un solo frame estático
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        })();
+    </script>
 
     <!-- Swiper.js JS -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
