@@ -142,6 +142,59 @@
             #hero-rotator, #hero-parallax { transition: none !important; transform: none !important; }
         }
 
+        /* --- Ventana de código (hero estilo developer) --- */
+        #code-window {
+            font-family: ui-monospace, SFMono-Regular, 'Fira Code', Menlo, Consolas, monospace;
+            background: rgba(8, 11, 20, 0.72);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 30px 80px -30px rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            overflow: hidden;
+            transition: transform 0.2s cubic-bezier(0.16, 0.84, 0.44, 1);
+            will-change: transform;
+            transform-style: preserve-3d;
+        }
+        .code-titlebar {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+        .code-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .code-badge { margin-left: auto; font-size: 0.7rem; color: #9be7a0; display: flex; align-items: center; gap: 0.4rem; }
+        .code-badge .pulse {
+            width: 7px; height: 7px; border-radius: 50%; background: #34d399;
+            animation: pulse 1.8s infinite;
+        }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.6); }
+            70%  { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
+            100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+        }
+        .code-body {
+            padding: 1.1rem 1.25rem 1.4rem;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre;
+            overflow-x: auto;
+            min-height: 17.5rem;
+            color: #c9d4e8;
+        }
+        .code-caret {
+            display: inline-block; width: 8px; height: 1.05em; transform: translateY(2px);
+            background: #5B8CFF; margin-left: 2px;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .tok-kw   { color: #c792ea; }
+        .tok-var  { color: #82aaff; }
+        .tok-prop { color: #7fdbca; }
+        .tok-str  { color: #c3e88d; }
+        .tok-punc { color: #89ddff; }
+        .tok-fn   { color: #ffcb6b; }
+        .tok-num  { color: #f78c6c; }
+
         /* --- Scrollytelling: animaciones de scroll fluidas --- */
         .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale {
             opacity: 0;
@@ -243,16 +296,31 @@
             <div id="hero-background"></div>
             <div id="hero-spotlight"></div>
             <div class="container mx-auto px-6">
-                <div id="hero-parallax" class="max-w-4xl reveal-stagger">
-                    <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Desarrollo Web Multimedia</p>
-                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.04] mb-6 text-white">
-                        <span class="block" data-lang="hero_title_pre">Desarrollador</span>
-                        <span id="hero-rotator" class="style-gradient">Multimedia Web</span>
-                    </h1>
-                    <p class="text-lg md:text-xl text-muted max-w-2xl mb-10 leading-relaxed" data-lang="hero_subtitle">Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.</p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#projects" class="btn btn-primary" data-lang="hero_btn_projects">Ver Mis Proyectos</a>
-                        <a href="#contact" class="btn btn-secondary" data-lang="hero_btn_contact">Contáctame</a>
+                <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                    <div id="hero-parallax" class="max-w-2xl reveal-stagger">
+                        <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Desarrollo Web Multimedia</p>
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-white">
+                            <span class="block" data-lang="hero_title_pre">Desarrollador</span>
+                            <span id="hero-rotator" class="style-gradient">Multimedia Web</span>
+                        </h1>
+                        <p class="text-lg text-muted max-w-xl mb-10 leading-relaxed" data-lang="hero_subtitle">Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.</p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#projects" class="btn btn-primary" data-lang="hero_btn_projects">Ver Mis Proyectos</a>
+                            <a href="#contact" class="btn btn-secondary" data-lang="hero_btn_contact">Contáctame</a>
+                        </div>
+                    </div>
+                    <div class="reveal-right">
+                        <div id="code-window" class="cursor-pointer select-none" role="img" aria-label="Snippet de código que describe a Alex Andrade">
+                            <div class="code-titlebar">
+                                <span class="code-dot" style="background:#ff5f56"></span>
+                                <span class="code-dot" style="background:#ffbd2e"></span>
+                                <span class="code-dot" style="background:#27c93f"></span>
+                                <span class="ml-2 text-xs text-gray-500">alex.developer.js</span>
+                                <span class="code-badge"><span class="pulse"></span>online</span>
+                            </div>
+                            <div class="code-body"><code id="code-content"></code><span class="code-caret" id="code-caret"></span></div>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-3 text-center" data-lang="code_hint">Haz clic en el código para re-ejecutar ▶</p>
                     </div>
                 </div>
             </div>
@@ -586,6 +654,7 @@
                     hero_eyebrow: "Alex Andrade — Desarrollo Web Multimedia",
                     hero_title_pre: "Desarrollador", hero_subtitle: "Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.",
                     hero_btn_projects: "Ver Mis Proyectos", hero_btn_contact: "Contáctame",
+                    code_hint: "Haz clic en el código para re-ejecutar ▶",
                     about_eyebrow: "Perfil",
                     about_title: "Sobre Mí", about_p1: "¡Hola! Soy Alex Andrade Hernández, desarrollador multimedia web apasionado por crear experiencias digitales interactivas.", about_p2: "Soy Tecnólogo en Diseño Multimedia con formación en Ingeniería Multimedia (8 semestres). Combino desarrollo front-end con diseño y animación para construir sitios y aplicaciones web rápidas, accesibles y memorables.", about_p3: "Trabajo con HTML, CSS y JavaScript moderno, frameworks como React, y animación web (GSAP, Three.js, WebGL). Me enfoco en llevar las interfaces del concepto al navegador, cuidando el rendimiento, la experiencia de usuario y el detalle visual.",
                     skills_eyebrow: "Lo que hago",
@@ -605,6 +674,7 @@
                     hero_eyebrow: "Alex Andrade — Multimedia Web Development",
                     hero_title_pre: "Developer", hero_subtitle: "I build interactive, immersive web experiences — blending code, design and animation to craft interfaces that communicate and captivate.",
                     hero_btn_projects: "View My Projects", hero_btn_contact: "Contact Me",
+                    code_hint: "Click the code to re-run ▶",
                     about_eyebrow: "Profile",
                     about_title: "About Me", about_p1: "Hello! I am Alex Andrade Hernández, a multimedia web developer passionate about building interactive digital experiences.", about_p2: "I am a Multimedia Design Technologist with training in Multimedia Engineering (8 semesters). I blend front-end development with design and animation to build fast, accessible and memorable websites and web apps.", about_p3: "I work with modern HTML, CSS and JavaScript, frameworks like React, and web animation (GSAP, Three.js, WebGL). I focus on taking interfaces from concept to the browser, caring about performance, user experience and visual detail.",
                     skills_eyebrow: "What I do",
@@ -693,6 +763,54 @@
                 heroSection.addEventListener('pointerleave', () => {
                     if (heroParallax) heroParallax.style.transform = 'translate(0,0)';
                 });
+            }
+
+            // --- HERO: VENTANA DE CÓDIGO QUE SE ESCRIBE SOLA ---
+            const codeContent = document.getElementById('code-content');
+            const codeWindow = document.getElementById('code-window');
+            const CODE_TOKENS = [
+                { t: 'const ', c: 'kw' }, { t: 'alex', c: 'var' }, { t: ' = ', c: 'punc' }, { t: '{', c: 'punc' }, { t: '\n  ', c: '' },
+                { t: 'role', c: 'prop' }, { t: ': ', c: 'punc' }, { t: '"Multimedia Web Developer"', c: 'str' }, { t: ',', c: 'punc' }, { t: '\n  ', c: '' },
+                { t: 'stack', c: 'prop' }, { t: ': ', c: 'punc' }, { t: '[', c: 'punc' }, { t: '"HTML"', c: 'str' }, { t: ', ', c: 'punc' }, { t: '"CSS"', c: 'str' }, { t: ', ', c: 'punc' }, { t: '"JavaScript"', c: 'str' }, { t: ', ', c: 'punc' }, { t: '"React"', c: 'str' }, { t: ']', c: 'punc' }, { t: ',', c: 'punc' }, { t: '\n  ', c: '' },
+                { t: 'craft', c: 'prop' }, { t: ': ', c: 'punc' }, { t: '[', c: 'punc' }, { t: '"Three.js"', c: 'str' }, { t: ', ', c: 'punc' }, { t: '"WebGL"', c: 'str' }, { t: ', ', c: 'punc' }, { t: '"GSAP"', c: 'str' }, { t: ', ', c: 'punc' }, { t: '"UI/UX"', c: 'str' }, { t: ']', c: 'punc' }, { t: ',', c: 'punc' }, { t: '\n  ', c: '' },
+                { t: 'available', c: 'prop' }, { t: ': ', c: 'punc' }, { t: 'true', c: 'kw' }, { t: ',', c: 'punc' }, { t: '\n  ', c: '' },
+                { t: 'build', c: 'fn' }, { t: '() ', c: 'punc' }, { t: '{', c: 'punc' }, { t: '\n    ', c: '' },
+                { t: 'return ', c: 'kw' }, { t: '"experiencias web inmersivas"', c: 'str' }, { t: ';', c: 'punc' }, { t: '\n  ', c: '' },
+                { t: '}', c: 'punc' }, { t: '\n', c: '' },
+                { t: '}', c: 'punc' }, { t: ';', c: 'punc' }
+            ];
+            const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+            let codeTyping = false;
+            async function typeCode() {
+                if (!codeContent || codeTyping) return;
+                codeTyping = true;
+                codeContent.innerHTML = '';
+                for (const tok of CODE_TOKENS) {
+                    const span = document.createElement('span');
+                    if (tok.c) span.className = 'tok-' + tok.c;
+                    codeContent.appendChild(span);
+                    if (heroReduceMotion) { span.textContent = tok.t; continue; }
+                    for (const ch of tok.t) {
+                        span.textContent += ch;
+                        await sleep(ch === '\n' ? 80 : (ch === ' ' ? 8 : 16));
+                    }
+                }
+                codeTyping = false;
+            }
+            if (codeContent) {
+                typeCode();
+                if (codeWindow) codeWindow.addEventListener('click', () => typeCode());
+            }
+
+            // Tilt 3D de la ventana de código según el cursor
+            if (heroSection && codeWindow && !heroReduceMotion) {
+                heroSection.addEventListener('pointermove', (e) => {
+                    const r = heroSection.getBoundingClientRect();
+                    const x = (e.clientX - r.left) / r.width - 0.5;
+                    const y = (e.clientY - r.top) / r.height - 0.5;
+                    codeWindow.style.transform = 'perspective(900px) rotateY(' + (x * 7).toFixed(2) + 'deg) rotateX(' + (y * -7).toFixed(2) + 'deg)';
+                });
+                heroSection.addEventListener('pointerleave', () => { codeWindow.style.transform = ''; });
             }
 
             // --- LÓGICA DE NAVEGACIÓN ACTIVA ---
