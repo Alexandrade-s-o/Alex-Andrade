@@ -96,7 +96,51 @@
             100% { transform: translate3d(2%, -2%, 0) scale(1.06); opacity: 1; }
         }
 
+        /* Foco de luz interactivo que sigue al cursor en el hero */
+        #hero-spotlight {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(440px circle at var(--mx, 30%) var(--my, 40%), rgba(91, 140, 255, 0.16), transparent 62%);
+            transition: opacity 0.4s ease;
+        }
+
         #home .container { position: relative; z-index: 1; }
+
+        /* Parallax sutil del contenido del hero */
+        #hero-parallax {
+            transition: transform 0.25s cubic-bezier(0.16, 0.84, 0.44, 1);
+            will-change: transform;
+        }
+
+        /* --- Tipografía cinética: la palabra cambia de diseño --- */
+        #hero-rotator {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(0.38em);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 0.84, 0.44, 1);
+            padding-right: 0.08em; /* aire para el glow/stroke */
+        }
+        #hero-rotator.is-active { opacity: 1; transform: none; }
+        #hero-rotator.is-out { opacity: 0; transform: translateY(-0.38em); }
+
+        /* Cada palabra usa un tratamiento tipográfico distinto */
+        .style-gradient {
+            background: linear-gradient(92deg, #5B8CFF, #22d3ee 70%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .style-solid   { color: #FFFFFF; }
+        .style-outline {
+            color: transparent;
+            -webkit-text-stroke: 2px #5B8CFF;
+        }
+        .style-italic  { font-style: italic; font-weight: 600; color: #CDD6E6; }
+        .style-glow    { color: #BCD4FF; text-shadow: 0 0 28px rgba(91, 140, 255, 0.75); }
+
+        @media (prefers-reduced-motion: reduce) {
+            #hero-rotator, #hero-parallax { transition: none !important; transform: none !important; }
+        }
 
         /* --- Scrollytelling: animaciones de scroll fluidas --- */
         .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale {
@@ -197,10 +241,14 @@
         <!-- Sección Home -->
         <section id="home" class="relative min-h-[calc(100vh-73px)] flex items-center py-28">
             <div id="hero-background"></div>
+            <div id="hero-spotlight"></div>
             <div class="container mx-auto px-6">
-                <div class="max-w-4xl reveal-stagger">
+                <div id="hero-parallax" class="max-w-4xl reveal-stagger">
                     <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Desarrollo Web Multimedia</p>
-                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.04] mb-6 text-white" data-lang="hero_title">Desarrollador Multimedia Web</h1>
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.04] mb-6 text-white">
+                        <span class="block" data-lang="hero_title_pre">Desarrollador</span>
+                        <span id="hero-rotator" class="style-gradient">Multimedia Web</span>
+                    </h1>
                     <p class="text-lg md:text-xl text-muted max-w-2xl mb-10 leading-relaxed" data-lang="hero_subtitle">Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.</p>
                     <div class="flex flex-wrap gap-4">
                         <a href="#projects" class="btn btn-primary" data-lang="hero_btn_projects">Ver Mis Proyectos</a>
@@ -536,7 +584,7 @@
                 es: {
                     nav_home: "Inicio", nav_about: "Sobre Mí", nav_projects: "Proyectos", nav_contact: "Contacto",
                     hero_eyebrow: "Alex Andrade — Desarrollo Web Multimedia",
-                    hero_title: "Desarrollador Multimedia Web", hero_subtitle: "Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.",
+                    hero_title_pre: "Desarrollador", hero_subtitle: "Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.",
                     hero_btn_projects: "Ver Mis Proyectos", hero_btn_contact: "Contáctame",
                     about_eyebrow: "Perfil",
                     about_title: "Sobre Mí", about_p1: "¡Hola! Soy Alex Andrade Hernández, desarrollador multimedia web apasionado por crear experiencias digitales interactivas.", about_p2: "Soy Tecnólogo en Diseño Multimedia con formación en Ingeniería Multimedia (8 semestres). Combino desarrollo front-end con diseño y animación para construir sitios y aplicaciones web rápidas, accesibles y memorables.", about_p3: "Trabajo con HTML, CSS y JavaScript moderno, frameworks como React, y animación web (GSAP, Three.js, WebGL). Me enfoco en llevar las interfaces del concepto al navegador, cuidando el rendimiento, la experiencia de usuario y el detalle visual.",
@@ -555,7 +603,7 @@
                 en: {
                     nav_home: "Home", nav_about: "About Me", nav_projects: "Projects", nav_contact: "Contact",
                     hero_eyebrow: "Alex Andrade — Multimedia Web Development",
-                    hero_title: "Multimedia Web Developer", hero_subtitle: "I build interactive, immersive web experiences — blending code, design and animation to craft interfaces that communicate and captivate.",
+                    hero_title_pre: "Developer", hero_subtitle: "I build interactive, immersive web experiences — blending code, design and animation to craft interfaces that communicate and captivate.",
                     hero_btn_projects: "View My Projects", hero_btn_contact: "Contact Me",
                     about_eyebrow: "Profile",
                     about_title: "About Me", about_p1: "Hello! I am Alex Andrade Hernández, a multimedia web developer passionate about building interactive digital experiences.", about_p2: "I am a Multimedia Design Technologist with training in Multimedia Engineering (8 semesters). I blend front-end development with design and animation to build fast, accessible and memorable websites and web apps.", about_p3: "I work with modern HTML, CSS and JavaScript, frameworks like React, and web animation (GSAP, Three.js, WebGL). I focus on taking interfaces from concept to the browser, caring about performance, user experience and visual detail.",
@@ -593,6 +641,59 @@
             langEnBtn.addEventListener('click', () => setLanguage('en'));
             const savedLang = localStorage.getItem('language') || (navigator.language.startsWith('es') ? 'es' : 'en');
             setLanguage(savedLang);
+
+            // --- HERO: TIPOGRAFÍA CINÉTICA (la palabra cambia de diseño) ---
+            const heroReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const rotatorEl = document.getElementById('hero-rotator');
+            const roleWords = {
+                es: ['Multimedia Web', 'Interactivo', 'Creativo', 'Inmersivo', '3D & Motion'],
+                en: ['Multimedia Web', 'Interactive', 'Creative', 'Immersive', '3D & Motion']
+            };
+            const roleStyles = ['style-gradient', 'style-solid', 'style-italic', 'style-glow', 'style-outline'];
+            let roleIdx = 0;
+            const curLang = () => (roleWords[document.documentElement.lang] ? document.documentElement.lang : 'es');
+            function showRole(i) {
+                if (!rotatorEl) return;
+                const list = roleWords[curLang()];
+                roleIdx = ((i % list.length) + list.length) % list.length;
+                rotatorEl.className = roleStyles[roleIdx % roleStyles.length];
+                rotatorEl.textContent = list[roleIdx];
+                rotatorEl.classList.remove('is-active', 'is-out');
+                void rotatorEl.offsetWidth; // re-dispara la animación de entrada
+                rotatorEl.classList.add('is-active');
+            }
+            function rotateRole() {
+                if (!rotatorEl) return;
+                rotatorEl.classList.add('is-out');
+                setTimeout(() => showRole(roleIdx + 1), 480);
+            }
+            if (rotatorEl) {
+                showRole(0);
+                if (!heroReduceMotion) setInterval(rotateRole, 2600);
+                [langEsBtn, langEnBtn].forEach(b => b.addEventListener('click', () => showRole(roleIdx)));
+            }
+
+            // --- HERO: FOCO INTERACTIVO + PARALLAX SUTIL ---
+            const heroSection = document.getElementById('home');
+            const heroSpotlight = document.getElementById('hero-spotlight');
+            const heroParallax = document.getElementById('hero-parallax');
+            if (heroSection && !heroReduceMotion) {
+                heroSection.addEventListener('pointermove', (e) => {
+                    const r = heroSection.getBoundingClientRect();
+                    const x = (e.clientX - r.left) / r.width;
+                    const y = (e.clientY - r.top) / r.height;
+                    if (heroSpotlight) {
+                        heroSpotlight.style.setProperty('--mx', (x * 100) + '%');
+                        heroSpotlight.style.setProperty('--my', (y * 100) + '%');
+                    }
+                    if (heroParallax) {
+                        heroParallax.style.transform = 'translate(' + ((x - 0.5) * -14) + 'px,' + ((y - 0.5) * -10) + 'px)';
+                    }
+                });
+                heroSection.addEventListener('pointerleave', () => {
+                    if (heroParallax) heroParallax.style.transform = 'translate(0,0)';
+                });
+            }
 
             // --- LÓGICA DE NAVEGACIÓN ACTIVA ---
             const sections = document.querySelectorAll('section');
