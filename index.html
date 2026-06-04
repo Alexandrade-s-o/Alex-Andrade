@@ -499,219 +499,107 @@
     <!-- Three.js para la animación 3D de fondo (copia local, sin depender de CDN) -->
     <script src="vendor/three.min.js"></script>
     <script>
-        // --- RED NEURONAL DE FONDO (Three.js) ---
-        // Nodos flotando en el espacio, conectados por líneas cuando están cerca.
-        // Reactivo al mouse: el cursor actúa como un nodo que atrae e ilumina las
-        // conexiones cercanas, como una sinapsis.
-        (function initNeuralBackground() {
+        // --- FONDO: GRADIENTE FLUIDO ANIMADO (shader GLSL) ---
+        // Aurora líquida de ruido orgánico en azul/cian/índigo. Reactiva al mouse y
+        // al scroll, adaptada a tema oscuro/claro. Diseño digital, suave y vistoso.
+        (function initBackground() {
             const canvas = document.getElementById('bg-canvas-3d');
             if (!canvas || typeof THREE === 'undefined') return;
-
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 90;
-
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setClearColor(0x000000, 0);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
+            const setDPR = () => renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 0.85 : 1.25));
+            setDPR();
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            // Volumen del campo
-            const RX = 170, RY = 110, RZ = 70;
-            const NODES = window.innerWidth < 768 ? 70 : 130;
-            const CONNECT = 26;     // distancia máxima para conectar dos nodos
-            const MOUSE_R = 52;     // radio de influencia del cursor
+            const scene = new THREE.Scene();
+            const camera = new THREE.Camera();
 
-            // Posiciones y velocidades de los nodos
-            const nodePos = new Float32Array(NODES * 3);
-            const nodeVel = new Float32Array(NODES * 3);
-            for (let i = 0; i < NODES; i++) {
-                const i3 = i * 3;
-                nodePos[i3]     = (Math.random() - 0.5) * RX;
-                nodePos[i3 + 1] = (Math.random() - 0.5) * RY;
-                nodePos[i3 + 2] = (Math.random() - 0.5) * RZ;
-                nodeVel[i3]     = (Math.random() - 0.5) * 6;
-                nodeVel[i3 + 1] = (Math.random() - 0.5) * 6;
-                nodeVel[i3 + 2] = (Math.random() - 0.5) * 4;
-            }
+            const uniforms = {
+                u_time:   { value: 0 },
+                u_res:    { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                u_mouse:  { value: new THREE.Vector2(0.5, 0.5) },
+                u_dark:   { value: (document.documentElement.dataset.theme || 'dark') === 'dark' ? 1.0 : 0.0 },
+                u_scroll: { value: 0.0 }
+            };
 
-            // Nodos (puntos)
-            const nodeGeo = new THREE.BufferGeometry();
-            nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodePos, 3));
-            const nodeMat = new THREE.PointsMaterial({
-                color: 0x2f6bff,
-                size: 2.4,
-                sizeAttenuation: true,
-                transparent: true,
-                opacity: 0.95,
-                depthWrite: false,
-                blending: THREE.NormalBlending
-            });
-            const nodePoints = new THREE.Points(nodeGeo, nodeMat);
-            scene.add(nodePoints);
+            const vert = 'void main(){ gl_Position = vec4(position, 1.0); }';
+            const frag = [
+                'precision highp float;',
+                'uniform float u_time; uniform vec2 u_res; uniform vec2 u_mouse; uniform float u_dark; uniform float u_scroll;',
+                'float vnoise(vec2 p){',
+                '  vec2 i=floor(p); vec2 f=fract(p);',
+                '  float a=fract(sin(dot(i,vec2(127.1,311.7)))*43758.5453);',
+                '  float b=fract(sin(dot(i+vec2(1.0,0.0),vec2(127.1,311.7)))*43758.5453);',
+                '  float c=fract(sin(dot(i+vec2(0.0,1.0),vec2(127.1,311.7)))*43758.5453);',
+                '  float d=fract(sin(dot(i+vec2(1.0,1.0),vec2(127.1,311.7)))*43758.5453);',
+                '  vec2 u=f*f*(3.0-2.0*f);',
+                '  return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);',
+                '}',
+                'float fbm(vec2 p){ float v=0.0; float amp=0.5; for(int i=0;i<4;i++){ v+=amp*vnoise(p); p*=2.0; amp*=0.5; } return v; }',
+                'void main(){',
+                '  vec2 uv = gl_FragCoord.xy / u_res.xy;',
+                '  vec2 p = uv; p.x *= u_res.x/u_res.y;',
+                '  float t = u_time*0.05 + u_scroll*1.2;',
+                '  vec2 m = (u_mouse - 0.5);',
+                '  vec2 q = vec2(fbm(p*2.2 + vec2(0.0, t)), fbm(p*2.2 + vec2(5.2,1.3) - t));',
+                '  vec2 r = vec2(fbm(p*2.2 + 2.8*q + vec2(1.7,9.2) + m*0.7 + 0.5*t), fbm(p*2.2 + 2.8*q + vec2(8.3,2.8) - m*0.7));',
+                '  float f = fbm(p*2.2 + 2.4*r);',
+                '  vec3 cBlue = vec3(0.12,0.34,0.98);',
+                '  vec3 cCyan = vec3(0.10,0.78,0.98);',
+                '  vec3 cViol = vec3(0.45,0.22,0.97);',
+                '  vec3 col = mix(cBlue, cCyan, smoothstep(0.1,0.9,f));',
+                '  col = mix(col, cViol, smoothstep(0.35,1.0, length(r)));',
+                '  float glow = pow(clamp(f,0.0,1.0), 1.4);',
+                '  vec3 outc;',
+                '  if(u_dark > 0.5){',
+                '     vec3 bg = vec3(0.018,0.025,0.05);',
+                '     outc = bg + col*(0.22 + 0.75*glow);',
+                '     outc += cCyan * pow(max(0.0, 1.0 - length(r-0.5)), 3.0) * 0.12;',
+                '  } else {',
+                '     vec3 tint = mix(col, vec3(1.0), 0.45);',
+                '     outc = mix(vec3(1.0), tint, 0.10 + 0.34*glow);',
+                '  }',
+                '  float grain = (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898,78.233)))*43758.5453)-0.5);',
+                '  outc += grain * (u_dark>0.5 ? 0.03 : 0.015);',
+                '  float vig = smoothstep(1.25, 0.25, length(uv-0.5));',
+                '  outc *= mix(1.0, vig, u_dark>0.5 ? 0.35 : 0.12);',
+                '  gl_FragColor = vec4(outc, 1.0);',
+                '}'
+            ].join('\n');
 
-            // Líneas (conexiones) — buffer preasignado
-            const MAX_SEG = NODES * 16;
-            const linePos = new Float32Array(MAX_SEG * 6);
-            const lineCol = new Float32Array(MAX_SEG * 6);
-            const lineGeo = new THREE.BufferGeometry();
-            lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
-            lineGeo.setAttribute('color', new THREE.BufferAttribute(lineCol, 3));
-            const lineMat = new THREE.LineBasicMaterial({
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.72,
-                depthWrite: false,
-                blending: THREE.NormalBlending
-            });
-            const lines = new THREE.LineSegments(lineGeo, lineMat);
-            scene.add(lines);
+            const material = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vert, fragmentShader: frag, depthTest: false, depthWrite: false });
+            const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+            scene.add(quad);
 
-            // Colores base (azul) y de sinapsis con el mouse (cian brillante)
-            const BASE = { r: 0.16, g: 0.38, b: 0.95 };
-            const SYN  = { r: 0.02, g: 0.60, b: 0.85 };
+            const targetMouse = new THREE.Vector2(0.5, 0.5);
+            window.addEventListener('pointermove', function (e) {
+                targetMouse.set(e.clientX / window.innerWidth, 1.0 - e.clientY / window.innerHeight);
+            }, { passive: true });
 
-            // El tema (oscuro/claro) cambia la mezcla y el desvanecido de la red
-            let darkTheme = (document.documentElement.dataset.theme || 'dark') === 'dark';
-            function applyNeuralTheme() {
-                if (darkTheme) {
-                    lineMat.blending = THREE.AdditiveBlending;
-                    nodeMat.blending = THREE.AdditiveBlending;
-                    nodeMat.color.set(0x9bc0ff);
-                    lineMat.opacity = 0.9;
-                } else {
-                    lineMat.blending = THREE.NormalBlending;
-                    nodeMat.blending = THREE.NormalBlending;
-                    nodeMat.color.set(0x2f6bff);
-                    lineMat.opacity = 0.72;
-                }
-                lineMat.needsUpdate = true;
-                nodeMat.needsUpdate = true;
-            }
-            applyNeuralTheme();
-            window.__setNeuralTheme = function (isDark) { darkTheme = isDark; applyNeuralTheme(); };
-
-            // --- Interacción con el mouse ---
-            const mouseNDC = new THREE.Vector2(0, 0);
-            let pointerActive = false;
-            const targetWorld = new THREE.Vector3();
-            const mouseWorld = new THREE.Vector3(0, 0, 0);
-            const raycaster = new THREE.Raycaster();
-            const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-
-            window.addEventListener('pointermove', (e) => {
-                mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
-                mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
-                pointerActive = true;
-            });
-            window.addEventListener('pointerleave', () => { pointerActive = false; });
-
-            // Progreso de scroll → la cámara "viaja" por la red al desplazarse.
             let scrollP = 0;
-            const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-            window.addEventListener('scroll', () => { scrollP = window.scrollY / maxScroll(); }, { passive: true });
+            window.addEventListener('scroll', function () {
+                const mx = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+                scrollP = window.scrollY / mx;
+            }, { passive: true });
+
+            // Hook usado por el botón de tema
+            window.__setNeuralTheme = function (isDark) { uniforms.u_dark.value = isDark ? 1.0 : 0.0; };
 
             const clock = new THREE.Clock();
-
             function frame() {
-                const dt = Math.min(clock.getDelta(), 0.05);
-
-                // Mover nodos con rebote en los límites del volumen
-                for (let i = 0; i < NODES; i++) {
-                    const i3 = i * 3;
-                    nodePos[i3]     += nodeVel[i3] * dt;
-                    nodePos[i3 + 1] += nodeVel[i3 + 1] * dt;
-                    nodePos[i3 + 2] += nodeVel[i3 + 2] * dt;
-                    if (nodePos[i3]     >  RX / 2 || nodePos[i3]     < -RX / 2) nodeVel[i3]     *= -1;
-                    if (nodePos[i3 + 1] >  RY / 2 || nodePos[i3 + 1] < -RY / 2) nodeVel[i3 + 1] *= -1;
-                    if (nodePos[i3 + 2] >  RZ / 2 || nodePos[i3 + 2] < -RZ / 2) nodeVel[i3 + 2] *= -1;
-                }
-
-                // Posición del cursor en el mundo
-                if (pointerActive) {
-                    raycaster.setFromCamera(mouseNDC, camera);
-                    raycaster.ray.intersectPlane(plane, targetWorld);
-                    mouseWorld.lerp(targetWorld, 0.2);
-                }
-
-                // Construir conexiones
-                let seg = 0;
-                const C2 = CONNECT * CONNECT;
-                for (let i = 0; i < NODES; i++) {
-                    const i3 = i * 3;
-                    const ax = nodePos[i3], ay = nodePos[i3 + 1], az = nodePos[i3 + 2];
-
-                    for (let j = i + 1; j < NODES; j++) {
-                        const j3 = j * 3;
-                        const dx = ax - nodePos[j3];
-                        const dy = ay - nodePos[j3 + 1];
-                        const dz = az - nodePos[j3 + 2];
-                        const d2 = dx * dx + dy * dy + dz * dz;
-                        if (d2 < C2 && seg < MAX_SEG) {
-                            const a = 1 - Math.sqrt(d2) / CONNECT; // intensidad (fade)
-                            // En fondo blanco, desvanecer hacia el blanco (no hacia el negro)
-                            let br, bg, bb;
-                            if (darkTheme) { br = BASE.r * a; bg = BASE.g * a; bb = BASE.b * a; }
-                            else { br = 1 - (1 - BASE.r) * a; bg = 1 - (1 - BASE.g) * a; bb = 1 - (1 - BASE.b) * a; }
-                            const o = seg * 6;
-                            linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
-                            linePos[o + 3] = nodePos[j3]; linePos[o + 4] = nodePos[j3 + 1]; linePos[o + 5] = nodePos[j3 + 2];
-                            lineCol[o]     = br; lineCol[o + 1] = bg; lineCol[o + 2] = bb;
-                            lineCol[o + 3] = br; lineCol[o + 4] = bg; lineCol[o + 5] = bb;
-                            seg++;
-                        }
-                    }
-
-                    // Sinapsis con el cursor: conecta y atrae nodos cercanos
-                    if (pointerActive) {
-                        const mdx = ax - mouseWorld.x;
-                        const mdy = ay - mouseWorld.y;
-                        const mdist = Math.hypot(mdx, mdy);
-                        if (mdist < MOUSE_R && seg < MAX_SEG) {
-                            const a = 1 - mdist / MOUSE_R;
-                            // Conexión solo visual con el cursor (no mueve los nodos,
-                            // así la interacción no se acumula ni los amontona).
-                            let sr, sg, sb;
-                            if (darkTheme) { sr = SYN.r * a; sg = SYN.g * a; sb = SYN.b * a; }
-                            else { sr = 1 - (1 - SYN.r) * a; sg = 1 - (1 - SYN.g) * a; sb = 1 - (1 - SYN.b) * a; }
-                            const o = seg * 6;
-                            linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
-                            linePos[o + 3] = mouseWorld.x; linePos[o + 4] = mouseWorld.y; linePos[o + 5] = 0;
-                            lineCol[o]     = sr; lineCol[o + 1] = sg; lineCol[o + 2] = sb;
-                            lineCol[o + 3] = sr; lineCol[o + 4] = sg; lineCol[o + 5] = sb;
-                            seg++;
-                        }
-                    }
-                }
-
-                nodeGeo.attributes.position.needsUpdate = true;
-                lineGeo.attributes.position.needsUpdate = true;
-                lineGeo.attributes.color.needsUpdate = true;
-                lineGeo.setDrawRange(0, seg * 2);
-
-                // Parallax de cámara (mouse) + viaje por la red al hacer scroll.
-                // Solo movemos la cámara: el raycaster se recalcula cada frame, así
-                // la sinapsis del cursor sigue alineada y nada se desincroniza.
-                const camTargetX = pointerActive ? mouseNDC.x * 10 : 0;
-                const camTargetY = (pointerActive ? mouseNDC.y * 10 : 0) - scrollP * 40;
-                const camTargetZ = 90 - scrollP * 24;
-                camera.position.x += (camTargetX - camera.position.x) * 0.03;
-                camera.position.y += (camTargetY - camera.position.y) * 0.04;
-                camera.position.z += (camTargetZ - camera.position.z) * 0.04;
-                camera.lookAt(0, 0, 0);
-
+                uniforms.u_time.value = clock.getElapsedTime();
+                uniforms.u_mouse.value.lerp(targetMouse, 0.04);
+                uniforms.u_scroll.value += (scrollP - uniforms.u_scroll.value) * 0.05;
                 renderer.render(scene, camera);
                 if (!reduceMotion) requestAnimationFrame(frame);
             }
-
             frame();
 
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
+            window.addEventListener('resize', function () {
+                setDPR();
                 renderer.setSize(window.innerWidth, window.innerHeight);
+                uniforms.u_res.value.set(window.innerWidth, window.innerHeight);
             });
         })();
     </script>
