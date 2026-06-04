@@ -229,6 +229,13 @@
         .tok-fn   { color: var(--tok-fn); }
         .tok-num  { color: var(--tok-num); }
 
+        /* Ajustes responsive */
+        @media (max-width: 640px) {
+            .code-body { font-size: 0.78rem; min-height: 13.5rem; line-height: 1.6; padding: 0.25rem; }
+            #code-window { transform: none !important; } /* sin tilt 3D en móvil */
+            #hero-parallax { transform: none !important; } /* sin parallax en móvil */
+        }
+
         /* --- Scrollytelling: animaciones de scroll fluidas --- */
         .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale {
             opacity: 0;
@@ -322,7 +329,16 @@
                          <button id="lang-es" class="lang-btn-header px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-300">ES</button>
                          <button id="lang-en" class="lang-btn-header px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-300">EN</button>
                     </div>
+                    <button id="menu-toggle" type="button" aria-label="Menú" aria-expanded="false" class="md:hidden w-9 h-9 rounded-full border border-card flex items-center justify-center text-soft">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                    </button>
                 </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden border-t border-card mt-3 pt-2 pb-1 flex flex-col">
+                <a href="#home" class="nav-link py-3 text-soft" data-lang="nav_home">Inicio</a>
+                <a href="#about" class="nav-link py-3 text-soft" data-lang="nav_about">Sobre Mí</a>
+                <a href="#projects" class="nav-link py-3 text-soft" data-lang="nav_projects">Proyectos</a>
+                <a href="#contact" class="nav-link py-3 text-soft" data-lang="nav_contact">Contacto</a>
             </div>
         </div>
     </header>
@@ -334,9 +350,9 @@
             <div id="hero-spotlight"></div>
             <div class="container mx-auto px-6">
                 <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-                    <div id="hero-parallax" class="max-w-2xl reveal-stagger">
+                    <div id="hero-parallax" class="max-w-2xl min-w-0 reveal-stagger">
                         <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Desarrollo Web Multimedia</p>
-                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-strong">
+                        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-strong">
                             <span class="block" data-lang="hero_title_pre">Desarrollador</span>
                             <span id="hero-rotator" class="style-gradient">Multimedia Web</span>
                         </h1>
@@ -346,7 +362,7 @@
                             <a href="#contact" class="btn btn-secondary" data-lang="hero_btn_contact">Contáctame</a>
                         </div>
                     </div>
-                    <div class="reveal-right">
+                    <div class="reveal-right min-w-0">
                         <div id="code-window" class="cursor-pointer select-none" role="img" aria-label="Snippet de código que describe a Alex Andrade">
                             <div class="code-body"><code id="code-content"></code><span class="code-caret" id="code-caret"></span></div>
                         </div>
@@ -504,7 +520,7 @@
 
             // Volumen del campo
             const RX = 170, RY = 110, RZ = 70;
-            const NODES = 130;
+            const NODES = window.innerWidth < 768 ? 70 : 130;
             const CONNECT = 26;     // distancia máxima para conectar dos nodos
             const MOUSE_R = 52;     // radio de influencia del cursor
 
@@ -784,6 +800,19 @@
                 themeToggle.addEventListener('click', () => {
                     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
                 });
+            }
+
+            // --- MENÚ MÓVIL (hamburguesa) ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (menuToggle && mobileMenu) {
+                const closeMenu = () => { mobileMenu.classList.add('hidden'); menuToggle.setAttribute('aria-expanded', 'false'); };
+                menuToggle.addEventListener('click', () => {
+                    const isOpen = mobileMenu.classList.toggle('hidden') === false;
+                    menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+                mobileMenu.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
+                window.addEventListener('resize', () => { if (window.innerWidth >= 768) closeMenu(); });
             }
 
             // --- HERO: TIPOGRAFÍA CINÉTICA (la palabra cambia de diseño) ---
