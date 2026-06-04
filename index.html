@@ -33,6 +33,23 @@
         .text-muted { color: var(--muted); }
         .nav-link.active { color: var(--accent); }
 
+        /* --- Jugar con el contraste: banda oscura destacada --- */
+        .band-dark { background-color: #0A0E17; position: relative; }
+        .band-dark .eyebrow { color: #7CA3FF; }
+        .band-dark h2 { color: #F1F5F9 !important; }
+        .band-dark .bg-card { background-color: #121826; }
+        .band-dark .border-card { border-color: #23304A; }
+        .band-dark .text-slate-800 { color: #E2E8F0 !important; }
+        .band-dark .text-muted { color: #94A3B8; }
+        .band-dark .skill-icon-bg { background-color: rgba(255,255,255,0.06) !important; }
+        .band-dark .skill-icon-text { color: #7689A6; }
+
+        /* Profundidad de tarjetas sobre fondo blanco (contraste suave) */
+        #projects .project-trigger,
+        #contact .bg-card {
+            box-shadow: 0 22px 48px -30px rgba(2, 6, 23, 0.40);
+        }
+
         /* Canvas de animación 3D de fondo global (detrás de todo el contenido) */
         #bg-canvas-3d {
             position: fixed;
@@ -314,7 +331,8 @@
         </section>
 
         <!-- Sección My Skills -->
-        <section id="skills" class="py-28 md:py-40 container mx-auto px-6">
+        <section id="skills" class="band-dark py-28 md:py-40">
+            <div class="container mx-auto px-6">
              <div>
                 <div class="max-w-2xl mb-16 reveal-up">
                     <p class="eyebrow mb-3" data-lang="skills_eyebrow">Lo que hago</p>
@@ -355,6 +373,7 @@
                     </div>
                 </div>
              </div>
+            </div>
         </section>
 
         <!-- Sección Projects con Carrusel -->
@@ -487,7 +506,7 @@
             const lineMat = new THREE.LineBasicMaterial({
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.72,
                 depthWrite: false,
                 blending: THREE.NormalBlending
             });
