@@ -12,12 +12,12 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <style>
         :root {
-            --bg: #05070D;
-            --text: #E7EBF3;
-            --muted: #8A93A6;
-            --accent: #5B8CFF;
-            --card: #0B0F18;
-            --border: #1A2030;
+            --bg: #FFFFFF;
+            --text: #0F172A;
+            --muted: #64748B;
+            --accent: #2563EB;
+            --card: #F8FAFC;
+            --border: #E2E8F0;
         }
 
         /* Estilo base — estilo "espacio / red neuronal" */
@@ -73,10 +73,10 @@
             transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
         }
         .btn:hover { transform: translateY(-2px); }
-        .btn-primary { background-color: #FFFFFF; color: #05070D; }
-        .btn-primary:hover { background-color: #E2E8F0; }
-        .btn-secondary { border: 1px solid rgba(255,255,255,0.18); color: var(--text); }
-        .btn-secondary:hover { border-color: rgba(255,255,255,0.45); background-color: rgba(255,255,255,0.04); }
+        .btn-primary { background-color: var(--accent); color: #FFFFFF; }
+        .btn-primary:hover { background-color: #1D4ED8; }
+        .btn-secondary { border: 1px solid rgba(15,23,42,0.18); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--accent); background-color: rgba(37,99,235,0.06); }
 
         /* Glow sutil y profundo para el hero */
         #hero-background {
@@ -127,16 +127,16 @@
 
         /* Cada palabra usa un tratamiento tipográfico distinto */
         .style-gradient {
-            background: linear-gradient(92deg, #5B8CFF, #22d3ee 70%);
+            background: linear-gradient(92deg, #2563EB, #0891B2 75%);
             -webkit-background-clip: text; background-clip: text; color: transparent;
         }
-        .style-solid   { color: #FFFFFF; }
+        .style-solid   { color: #0F172A; }
         .style-outline {
             color: transparent;
-            -webkit-text-stroke: 2px #5B8CFF;
+            -webkit-text-stroke: 2px #2563EB;
         }
-        .style-italic  { font-style: italic; font-weight: 600; color: #CDD6E6; }
-        .style-glow    { color: #BCD4FF; text-shadow: 0 0 28px rgba(91, 140, 255, 0.75); }
+        .style-italic  { font-style: italic; font-weight: 600; color: #475569; }
+        .style-glow    { color: #2563EB; text-shadow: 0 0 26px rgba(37, 99, 235, 0.35); }
 
         @media (prefers-reduced-motion: reduce) {
             #hero-rotator, #hero-parallax { transition: none !important; transform: none !important; }
@@ -145,55 +145,33 @@
         /* --- Ventana de código (hero estilo developer) --- */
         #code-window {
             font-family: ui-monospace, SFMono-Regular, 'Fira Code', Menlo, Consolas, monospace;
-            background: rgba(8, 11, 20, 0.72);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 30px 80px -30px rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            overflow: hidden;
             transition: transform 0.2s cubic-bezier(0.16, 0.84, 0.44, 1);
             will-change: transform;
             transform-style: preserve-3d;
         }
-        .code-titlebar {
-            display: flex; align-items: center; gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.02);
-        }
-        .code-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .code-badge { margin-left: auto; font-size: 0.7rem; color: #9be7a0; display: flex; align-items: center; gap: 0.4rem; }
-        .code-badge .pulse {
-            width: 7px; height: 7px; border-radius: 50%; background: #34d399;
-            animation: pulse 1.8s infinite;
-        }
-        @keyframes pulse {
-            0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.6); }
-            70%  { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
-            100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
-        }
         .code-body {
-            padding: 1.1rem 1.25rem 1.4rem;
-            font-size: 0.9rem;
+            padding: 0.5rem 0.25rem;
+            font-size: 0.95rem;
             line-height: 1.7;
             white-space: pre;
             overflow-x: auto;
             min-height: 17.5rem;
-            color: #c9d4e8;
+            color: #334155;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.85);
         }
         .code-caret {
             display: inline-block; width: 8px; height: 1.05em; transform: translateY(2px);
-            background: #5B8CFF; margin-left: 2px;
+            background: #2563EB; margin-left: 2px;
             animation: blink 1s step-end infinite;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        .tok-kw   { color: #c792ea; }
-        .tok-var  { color: #82aaff; }
-        .tok-prop { color: #7fdbca; }
-        .tok-str  { color: #c3e88d; }
-        .tok-punc { color: #89ddff; }
-        .tok-fn   { color: #ffcb6b; }
-        .tok-num  { color: #f78c6c; }
+        .tok-kw   { color: #9333ea; }
+        .tok-var  { color: #2563eb; }
+        .tok-prop { color: #0e7490; }
+        .tok-str  { color: #15803d; }
+        .tok-punc { color: #0891b2; }
+        .tok-fn   { color: #b45309; }
+        .tok-num  { color: #c2410c; }
 
         /* --- Scrollytelling: animaciones de scroll fluidas --- */
         .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale {
@@ -272,15 +250,15 @@
     <canvas id="bg-canvas-3d"></canvas>
 
     <!-- Header / Barra de Navegación -->
-    <header id="header" class="sticky top-0 z-50 backdrop-blur-xl bg-[#05070D]/70 border-b border-card">
+    <header id="header" class="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-card">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
-                <div class="text-xl font-bold text-white tracking-tight"><a href="#home">Alex Andrade</a></div>
+                <div class="text-xl font-bold text-slate-900 tracking-tight"><a href="#home">Alex Andrade</a></div>
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="nav-link text-sm text-gray-400 hover:text-white transition-colors duration-300" data-lang="nav_home">Inicio</a>
-                    <a href="#about" class="nav-link text-sm text-gray-400 hover:text-white transition-colors duration-300" data-lang="nav_about">Sobre Mí</a>
-                    <a href="#projects" class="nav-link text-sm text-gray-400 hover:text-white transition-colors duration-300" data-lang="nav_projects">Proyectos</a>
-                    <a href="#contact" class="nav-link text-sm text-gray-400 hover:text-white transition-colors duration-300" data-lang="nav_contact">Contacto</a>
+                    <a href="#home" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_home">Inicio</a>
+                    <a href="#about" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_about">Sobre Mí</a>
+                    <a href="#projects" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_projects">Proyectos</a>
+                    <a href="#contact" class="nav-link text-sm text-slate-500 hover:text-slate-900 transition-colors duration-300" data-lang="nav_contact">Contacto</a>
                 </nav>
                 <div class="flex items-center bg-card p-1 rounded-full border border-card">
                      <button id="lang-es" class="lang-btn-header px-3 py-1 rounded-full text-xs font-semibold transition-colors duration-300">ES</button>
@@ -299,7 +277,7 @@
                 <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     <div id="hero-parallax" class="max-w-2xl reveal-stagger">
                         <p class="eyebrow mb-5" data-lang="hero_eyebrow">Alex Andrade — Desarrollo Web Multimedia</p>
-                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-white">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-slate-900">
                             <span class="block" data-lang="hero_title_pre">Desarrollador</span>
                             <span id="hero-rotator" class="style-gradient">Multimedia Web</span>
                         </h1>
@@ -311,13 +289,6 @@
                     </div>
                     <div class="reveal-right">
                         <div id="code-window" class="cursor-pointer select-none" role="img" aria-label="Snippet de código que describe a Alex Andrade">
-                            <div class="code-titlebar">
-                                <span class="code-dot" style="background:#ff5f56"></span>
-                                <span class="code-dot" style="background:#ffbd2e"></span>
-                                <span class="code-dot" style="background:#27c93f"></span>
-                                <span class="ml-2 text-xs text-gray-500">alex.developer.js</span>
-                                <span class="code-badge"><span class="pulse"></span>online</span>
-                            </div>
                             <div class="code-body"><code id="code-content"></code><span class="code-caret" id="code-caret"></span></div>
                         </div>
                         <p class="text-xs text-gray-600 mt-3 text-center" data-lang="code_hint">Haz clic en el código para re-ejecutar ▶</p>
@@ -334,7 +305,7 @@
                 </div>
                 <div class="md:col-span-2 text-lg text-muted space-y-6 leading-relaxed">
                      <p class="eyebrow" data-lang="about_eyebrow">Perfil</p>
-                     <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-white" data-lang="about_title">Sobre Mí</h2>
+                     <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900" data-lang="about_title">Sobre Mí</h2>
                     <p data-lang="about_p1">¡Hola! Soy Alex Andrade Hernández, desarrollador multimedia web apasionado por crear experiencias digitales interactivas.</p>
                     <p data-lang="about_p2">Soy Tecnólogo en Diseño Multimedia con formación en Ingeniería Multimedia (8 semestres). Combino desarrollo front-end con diseño y animación para construir sitios y aplicaciones web rápidas, accesibles y memorables.</p>
                     <p data-lang="about_p3">Trabajo con HTML, CSS y JavaScript moderno, frameworks como React, y animación web (GSAP, Three.js, WebGL). Me enfoco en llevar las interfaces del concepto al navegador, cuidando el rendimiento, la experiencia de usuario y el detalle visual.</p>
@@ -347,39 +318,39 @@
              <div>
                 <div class="max-w-2xl mb-16 reveal-up">
                     <p class="eyebrow mb-3" data-lang="skills_eyebrow">Lo que hago</p>
-                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-white" data-lang="skills_title">Mis Habilidades</h2>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900" data-lang="skills_title">Mis Habilidades</h2>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl reveal-stagger">
                     <!-- Skill Card: HTML & CSS -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-orange-500/40 hover:-translate-y-2" style="--hover-color: #f97316;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
                              <span class="skill-icon-text text-2xl font-extrabold text-gray-500">&lt;/&gt;</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ae_title">HTML5 &amp; CSS3</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_ae_title">HTML5 &amp; CSS3</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ae_desc">Maquetación semántica, responsive y accesible. Layouts modernos con Flexbox, Grid y Tailwind.</p>
                     </div>
                     <!-- Skill Card: JavaScript -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-yellow-500/40 hover:-translate-y-2" style="--hover-color: #eab308;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
                              <span class="skill-icon-text text-3xl font-extrabold text-gray-500">JS</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_pr_title">JavaScript</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_pr_title">JavaScript</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_pr_desc">Interactividad y lógica del lado del cliente con JavaScript moderno (ES6+) y APIs del navegador.</p>
                     </div>
                     <!-- Skill Card: React -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-cyan-500/40 hover:-translate-y-2" style="--hover-color: #06b6d4;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
                              <span class="skill-icon-text text-3xl font-extrabold text-gray-500">⚛</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ps_title">React &amp; Frameworks</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_ps_title">React &amp; Frameworks</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ps_desc">Aplicaciones web dinámicas con React y componentes reutilizables, escalables y mantenibles.</p>
                     </div>
                     <!-- Skill Card: Animación Web / UI-UX -->
                     <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-blue-500/40 hover:-translate-y-2" style="--hover-color: #3b82f6;">
-                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-white/5">
+                        <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl bg-slate-100">
                              <span class="skill-icon-text text-3xl font-extrabold text-gray-500">UI</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-100 mb-2" data-lang="skills_ai_title">Animación Web &amp; UI/UX</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2" data-lang="skills_ai_title">Animación Web &amp; UI/UX</h3>
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ai_desc">Interfaces y animaciones fluidas con GSAP, Three.js y WebGL para experiencias inmersivas.</p>
                     </div>
                 </div>
@@ -391,15 +362,15 @@
             <div class="reveal-up">
                 <div class="max-w-2xl mb-12">
                     <p class="eyebrow mb-3" data-lang="projects_eyebrow">Trabajo seleccionado</p>
-                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4" data-lang="projects_title">Proyectos</h2>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4" data-lang="projects_title">Proyectos</h2>
                     <p class="text-muted leading-relaxed" data-lang="projects_subtitle_carousel">Aquí hay algunas muestras de mi trabajo. Desliza para ver más y haz clic en cualquier proyecto para verlo.</p>
                 </div>
                 <div class="swiper-container max-w-6xl">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Web+Reel" alt="Web Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de desarrollo web e interacción.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="wLsHXR-egpg"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Portfolio" alt="Portfolio Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_portfolio_title">Portafolio</h3><p class="text-muted text-sm" data-lang="projects_portfolio_desc">Una selección destacada de mis proyectos y capacidades.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Web+App" alt="Web App Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_motion_title">Aplicaciones Web</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Interfaces dinámicas e interactivas para web y redes sociales.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/0B0F18/8A93A6?text=Web+Animation" alt="Web Animation Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-gray-100" data-lang="projects_vfx_title">Animación Web</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de experiencias animadas e interactivas en el navegador.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Reel" alt="Web Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de desarrollo web e interacción.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="wLsHXR-egpg"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Portfolio" alt="Portfolio Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_portfolio_title">Portafolio</h3><p class="text-muted text-sm" data-lang="projects_portfolio_desc">Una selección destacada de mis proyectos y capacidades.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+App" alt="Web App Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_motion_title">Aplicaciones Web</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Interfaces dinámicas e interactivas para web y redes sociales.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Animation" alt="Web Animation Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-slate-800" data-lang="projects_vfx_title">Animación Web</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de experiencias animadas e interactivas en el navegador.</p></div></div></div>
                     </div>
                     <div class="swiper-pagination mt-8"></div>
                     <div class="swiper-button-next"></div>
@@ -412,22 +383,22 @@
         <section id="contact" class="py-28 md:py-40 container mx-auto px-6">
             <div class="reveal-up max-w-2xl">
                 <p class="eyebrow mb-3" data-lang="contact_eyebrow">Hablemos</p>
-                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4" data-lang="contact_title">Ponte en Contacto</h2>
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4" data-lang="contact_title">Ponte en Contacto</h2>
                 <p class="text-muted mb-12 leading-relaxed" data-lang="contact_subtitle">Puedes contactarme directamente a través de los siguientes medios:</p>
                 <div class="bg-card border border-card rounded-2xl p-8 space-y-6">
-                    <a href="mailto:alexanher8@gmail.com" class="flex items-center space-x-4 p-4 rounded-xl hover:bg-white/5 transition-colors">
+                    <a href="mailto:alexanher8@gmail.com" class="flex items-center space-x-4 p-4 rounded-xl hover:bg-slate-100 transition-colors">
                         <svg class="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         <div class="text-left">
-                            <h3 class="font-semibold text-gray-100">Email</h3>
-                            <span class="text-lg text-blue-400">alexanher8@gmail.com</span>
+                            <h3 class="font-semibold text-slate-800">Email</h3>
+                            <span class="text-lg text-blue-600">alexanher8@gmail.com</span>
                         </div>
                     </a>
                     <div class="border-t border-card"></div>
-                    <a href="tel:+573502528104" class="flex items-center space-x-4 p-4 rounded-xl hover:bg-white/5 transition-colors">
+                    <a href="tel:+573502528104" class="flex items-center space-x-4 p-4 rounded-xl hover:bg-slate-100 transition-colors">
                         <svg class="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                         <div class="text-left">
-                            <h3 class="font-semibold text-gray-100" data-lang="contact_phone">WhatsApp / Teléfono</h3>
-                            <span class="text-lg text-blue-400">+573502528104</span>
+                            <h3 class="font-semibold text-slate-800" data-lang="contact_phone">WhatsApp / Teléfono</h3>
+                            <span class="text-lg text-blue-600">+573502528104</span>
                         </div>
                     </a>
                 </div>
@@ -495,13 +466,13 @@
             const nodeGeo = new THREE.BufferGeometry();
             nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodePos, 3));
             const nodeMat = new THREE.PointsMaterial({
-                color: 0x9bc0ff,
-                size: 2.2,
+                color: 0x2f6bff,
+                size: 2.4,
                 sizeAttenuation: true,
                 transparent: true,
-                opacity: 0.9,
+                opacity: 0.95,
                 depthWrite: false,
-                blending: THREE.AdditiveBlending
+                blending: THREE.NormalBlending
             });
             const nodePoints = new THREE.Points(nodeGeo, nodeMat);
             scene.add(nodePoints);
@@ -516,16 +487,16 @@
             const lineMat = new THREE.LineBasicMaterial({
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.9,
+                opacity: 0.6,
                 depthWrite: false,
-                blending: THREE.AdditiveBlending
+                blending: THREE.NormalBlending
             });
             const lines = new THREE.LineSegments(lineGeo, lineMat);
             scene.add(lines);
 
             // Colores base (azul) y de sinapsis con el mouse (cian brillante)
-            const BASE = { r: 0.23, g: 0.42, b: 1.0 };
-            const SYN  = { r: 0.45, g: 0.85, b: 1.0 };
+            const BASE = { r: 0.16, g: 0.38, b: 0.95 };
+            const SYN  = { r: 0.02, g: 0.60, b: 0.85 };
 
             // --- Interacción con el mouse ---
             const mouseNDC = new THREE.Vector2(0, 0);
@@ -585,11 +556,13 @@
                         const d2 = dx * dx + dy * dy + dz * dz;
                         if (d2 < C2 && seg < MAX_SEG) {
                             const a = 1 - Math.sqrt(d2) / CONNECT; // intensidad (fade)
+                            // En fondo blanco, desvanecer hacia el blanco (no hacia el negro)
+                            const br = 1 - (1 - BASE.r) * a, bg = 1 - (1 - BASE.g) * a, bb = 1 - (1 - BASE.b) * a;
                             const o = seg * 6;
                             linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
                             linePos[o + 3] = nodePos[j3]; linePos[o + 4] = nodePos[j3 + 1]; linePos[o + 5] = nodePos[j3 + 2];
-                            lineCol[o]     = BASE.r * a; lineCol[o + 1] = BASE.g * a; lineCol[o + 2] = BASE.b * a;
-                            lineCol[o + 3] = BASE.r * a; lineCol[o + 4] = BASE.g * a; lineCol[o + 5] = BASE.b * a;
+                            lineCol[o]     = br; lineCol[o + 1] = bg; lineCol[o + 2] = bb;
+                            lineCol[o + 3] = br; lineCol[o + 4] = bg; lineCol[o + 5] = bb;
                             seg++;
                         }
                     }
@@ -603,11 +576,12 @@
                             const a = 1 - mdist / MOUSE_R;
                             // Conexión solo visual con el cursor (no mueve los nodos,
                             // así la interacción no se acumula ni los amontona).
+                            const sr = 1 - (1 - SYN.r) * a, sg = 1 - (1 - SYN.g) * a, sb = 1 - (1 - SYN.b) * a;
                             const o = seg * 6;
                             linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
                             linePos[o + 3] = mouseWorld.x; linePos[o + 4] = mouseWorld.y; linePos[o + 5] = 0;
-                            lineCol[o]     = SYN.r * a; lineCol[o + 1] = SYN.g * a; lineCol[o + 2] = SYN.b * a;
-                            lineCol[o + 3] = SYN.r * a; lineCol[o + 4] = SYN.g * a; lineCol[o + 5] = SYN.b * a;
+                            lineCol[o]     = sr; lineCol[o + 1] = sg; lineCol[o + 2] = sb;
+                            lineCol[o + 3] = sr; lineCol[o + 4] = sg; lineCol[o + 5] = sb;
                             seg++;
                         }
                     }
