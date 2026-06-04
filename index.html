@@ -436,9 +436,8 @@
                         const mdist = Math.hypot(mdx, mdy);
                         if (mdist < MOUSE_R && seg < MAX_SEG) {
                             const a = 1 - mdist / MOUSE_R;
-                            // atracción suave hacia el cursor
-                            nodePos[i3]     -= mdx * a * 0.04;
-                            nodePos[i3 + 1] -= mdy * a * 0.04;
+                            // Conexión solo visual con el cursor (no mueve los nodos,
+                            // así la interacción no se acumula ni los amontona).
                             const o = seg * 6;
                             linePos[o]     = ax; linePos[o + 1] = ay; linePos[o + 2] = az;
                             linePos[o + 3] = mouseWorld.x; linePos[o + 4] = mouseWorld.y; linePos[o + 5] = 0;
