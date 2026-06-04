@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     <!-- Swiper.js CSS -->
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <style>
@@ -19,6 +19,7 @@
             --text: #0F172A;
             --muted: #64748B;
             --accent: #2563EB;
+            --font-display: 'Syne', 'Inter', sans-serif;
             --card: #FFFFFF;
             --border: #E6EAF2;
             --header-bg: rgba(255, 255, 255, 0.72);
@@ -66,6 +67,12 @@
             background-color: transparent;
             color: var(--text);
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* Tipografía display disruptiva (Syne) para los títulos */
+        h1, h2, .font-display {
+            font-family: var(--font-display);
+            letter-spacing: -0.02em;
         }
         .bg-card { background-color: var(--card); }
         .border-card { border-color: var(--border); }
@@ -302,7 +309,7 @@
     <header id="header" class="sticky top-0 z-50 backdrop-blur-xl border-b border-card">
         <div class="container mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
-                <div class="text-xl font-bold text-strong tracking-tight"><a href="#home">Alex Andrade</a></div>
+                <div class="font-display text-xl font-bold text-strong tracking-tight"><a href="#home">Alex Andrade</a></div>
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_home">Inicio</a>
                     <a href="#about" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_about">Sobre Mí</a>
