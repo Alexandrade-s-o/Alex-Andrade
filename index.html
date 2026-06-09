@@ -975,11 +975,20 @@
                 [langEsBtn, langEnBtn].forEach(b => b.addEventListener('click', () => showRole(roleIdx)));
             }
 
-            // --- HERO: FOCO INTERACTIVO + PARALLAX SUTIL ---
+            // --- HERO: FOCO INTERACTIVO + PARALLAX (mouse + scroll) ---
             const heroSection = document.getElementById('home');
             const heroSpotlight = document.getElementById('hero-spotlight');
             const heroParallax = document.getElementById('hero-parallax');
+            let hpMX = 0, hpMY = 0;
+            // El texto del hero retrocede y se desvanece a medida que entras en el viaje 3D
+            function applyHeroParallax() {
+                if (!heroParallax) return;
+                const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.85));
+                heroParallax.style.transform = 'translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 70).toFixed(1) + 'px,0)';
+                heroParallax.style.opacity = (1 - hp * 0.8).toFixed(3);
+            }
             if (heroSection && !heroReduceMotion) {
+                if (heroParallax) heroParallax.style.willChange = 'transform, opacity';
                 heroSection.addEventListener('pointermove', (e) => {
                     const r = heroSection.getBoundingClientRect();
                     const x = (e.clientX - r.left) / r.width;
@@ -988,13 +997,58 @@
                         heroSpotlight.style.setProperty('--mx', (x * 100) + '%');
                         heroSpotlight.style.setProperty('--my', (y * 100) + '%');
                     }
-                    if (heroParallax) {
-                        heroParallax.style.transform = 'translate(' + ((x - 0.5) * -14) + 'px,' + ((y - 0.5) * -10) + 'px)';
-                    }
+                    hpMX = (x - 0.5) * -14;
+                    hpMY = (y - 0.5) * -10;
+                    applyHeroParallax();
                 });
-                heroSection.addEventListener('pointerleave', () => {
-                    if (heroParallax) heroParallax.style.transform = 'translate(0,0)';
+                heroSection.addEventListener('pointerleave', () => { hpMX = 0; hpMY = 0; applyHeroParallax(); });
+            }
+
+            // --- SCROLLYTELLING DEL TEXTO: capas de parallax ligadas al scroll ---
+            // Cada bloque de texto se desplaza a distinta "profundidad" mientras haces scroll,
+            // así el contenido viaja junto con la cámara 3D en vez de quedar estático.
+            const parallaxLayers = [];
+            function addParallaxLayer(selector, depth, tilt) {
+                document.querySelectorAll(selector).forEach((el) => {
+                    el.style.willChange = 'transform';
+                    parallaxLayers.push({ el: el, depth: depth, tilt: tilt || 0 });
                 });
+            }
+            if (!heroReduceMotion) {
+                addParallaxLayer('#about h2, #skills h2, #projects h2, #contact h2', -48, -7);
+                addParallaxLayer('#about .eyebrow, #skills .eyebrow, #projects .eyebrow, #contact .eyebrow', 32, 0);
+                addParallaxLayer('#about p:not(.eyebrow), #projects .max-w-2xl p:not(.eyebrow), #contact .max-w-2xl p:not(.eyebrow)', -16, 0);
+            }
+            function applyParallaxLayers() {
+                const vh = window.innerHeight;
+                for (let i = 0; i < parallaxLayers.length; i++) {
+                    const L = parallaxLayers[i];
+                    const r = L.el.getBoundingClientRect();
+                    if (r.bottom < -120 || r.top > vh + 120) continue; // fuera de vista: no recalcular
+                    const rel = (r.top + r.height / 2 - vh / 2) / vh; // ~[-0.6, 0.6] al cruzar la pantalla
+                    const ty = (rel * L.depth).toFixed(1);
+                    L.el.style.transform = L.tilt
+                        ? 'perspective(900px) rotateX(' + (rel * L.tilt).toFixed(2) + 'deg) translate3d(0,' + ty + 'px,0)'
+                        : 'translate3d(0,' + ty + 'px,0)';
+                }
+            }
+
+            // rAF unificado para todo el parallax ligado al scroll (hero + capas de texto)
+            let parallaxTicking = false;
+            function onParallaxScroll() {
+                if (parallaxTicking) return;
+                parallaxTicking = true;
+                requestAnimationFrame(() => {
+                    applyHeroParallax();
+                    applyParallaxLayers();
+                    parallaxTicking = false;
+                });
+            }
+            if (!heroReduceMotion) {
+                window.addEventListener('scroll', onParallaxScroll, { passive: true });
+                window.addEventListener('resize', onParallaxScroll, { passive: true });
+                applyHeroParallax();
+                applyParallaxLayers();
             }
 
             // --- HERO: VENTANA DE CÓDIGO QUE SE ESCRIBE SOLA ---
