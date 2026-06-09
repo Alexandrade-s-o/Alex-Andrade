@@ -375,23 +375,46 @@
             #about img { animation: none !important; }
         }
 
-        /* Tarjetas de proyectos (GitHub) — minimalistas y de alto contraste */
-        .gh-card {
+        /* Proyectos: carrusel HORIZONTAL con preview de cada web */
+        .proj-scroll-wrap { position: relative; }
+        .h-scroll {
+            display: flex; gap: 1.5rem;
+            overflow-x: auto; overflow-y: hidden;
+            scroll-snap-type: x proximity;
+            padding: 4px 4px 1.25rem;
+            scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+        }
+        .h-scroll::-webkit-scrollbar { height: 8px; }
+        .h-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 9999px; }
+        .h-scroll::-webkit-scrollbar-track { background: transparent; }
+        .proj-card {
+            scroll-snap-align: start; flex: 0 0 auto;
+            width: clamp(270px, 80vw, 360px);
             display: flex; flex-direction: column;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.5rem;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden;
             transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
-        .gh-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--card-shadow); }
-        .gh-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.75rem; letter-spacing: 0.02em; }
-        .gh-dot { width: 0.6rem; height: 0.6rem; border-radius: 9999px; background: var(--accent); display: inline-block; flex: none; }
-        .gh-name { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 0.45rem; word-break: break-word; }
-        .gh-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.6; flex: 1 1 auto; }
-        .gh-links { display: flex; gap: 1.25rem; margin-top: 1.1rem; font-size: 0.88rem; font-weight: 600; }
-        .gh-links a { color: var(--accent); }
-        .gh-links a:hover { text-decoration: underline; }
+        .proj-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--card-shadow); }
+        .proj-preview {
+            aspect-ratio: 16 / 10; width: 100%;
+            background: linear-gradient(135deg, #ffffff, #ffe1e6);
+            border-bottom: 1px solid var(--border); overflow: hidden;
+        }
+        .proj-preview img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+        .proj-body { padding: 1.05rem 1.25rem 1.2rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+        .gh-name { font-size: 1.1rem; font-weight: 700; color: var(--text); word-break: break-word; }
+        .proj-link { color: var(--accent); font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
+        .proj-arrow {
+            position: absolute; top: 38%; transform: translateY(-50%); z-index: 3;
+            width: 2.75rem; height: 2.75rem; border-radius: 9999px;
+            background: var(--card); border: 1px solid var(--border); color: var(--text);
+            font-size: 1.4rem; line-height: 1; cursor: pointer; box-shadow: var(--card-shadow);
+            display: none; align-items: center; justify-content: center; transition: border-color 0.2s ease, color 0.2s ease;
+        }
+        .proj-arrow:hover { border-color: var(--accent); color: var(--accent); }
+        .proj-prev { left: -1.1rem; } .proj-next { right: -1.1rem; }
+        @media (min-width: 768px) { .proj-arrow { display: flex; } }
     </style>
 </head>
 <body class="antialiased">
@@ -530,10 +553,12 @@
                 <div class="max-w-2xl mb-12">
                     <p class="eyebrow mb-3" data-lang="projects_eyebrow">Trabajo seleccionado</p>
                     <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-strong mb-4" data-lang="projects_title">Proyectos</h2>
-                    <p class="text-muted leading-relaxed" data-lang="projects_subtitle">Proyectos reales, traídos en vivo desde mi GitHub. Cada tarjeta enlaza a la demo y al código.</p>
+                    <p class="text-muted leading-relaxed" data-lang="projects_subtitle">Algunos de mis proyectos, en vivo. Desliza en horizontal y entra a cualquiera.</p>
                 </div>
-                <div id="gh-projects" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl" aria-live="polite">
-                    <p id="gh-loading" class="text-muted" data-lang="projects_loading">Cargando proyectos desde GitHub…</p>
+                <div class="proj-scroll-wrap max-w-6xl">
+                    <button class="proj-arrow proj-prev" type="button" aria-label="Anterior">‹</button>
+                    <div id="gh-projects" class="h-scroll" aria-label="Proyectos"></div>
+                    <button class="proj-arrow proj-next" type="button" aria-label="Siguiente">›</button>
                 </div>
                 <div class="mt-10">
                     <a href="https://github.com/Alexandrade-s-o" target="_blank" rel="noopener" class="btn btn-secondary" data-lang="projects_all">Ver todos en GitHub ↗</a>
@@ -1021,7 +1046,7 @@
                     skills_eyebrow: "Lo que hago",
                     skills_title: "Mis Habilidades", skills_ae_title: "HTML5 &amp; CSS3", skills_ae_desc: "Maquetación semántica, responsive y accesible. Layouts modernos con Flexbox, Grid y Tailwind.", skills_pr_title: "JavaScript", skills_pr_desc: "Interactividad y lógica del lado del cliente con JavaScript moderno (ES6+) y APIs del navegador.", skills_ps_title: "React &amp; Frameworks", skills_ps_desc: "Aplicaciones web dinámicas con React y componentes reutilizables, escalables y mantenibles.", skills_ai_title: "Animación Web &amp; UI/UX", skills_ai_desc: "Interfaces y animaciones fluidas con GSAP, Three.js y WebGL para experiencias inmersivas.",
                     projects_eyebrow: "Trabajo seleccionado",
-                    projects_title: "Proyectos", projects_subtitle: "Proyectos reales, traídos en vivo desde mi GitHub. Cada tarjeta enlaza a la demo y al código.",
+                    projects_title: "Proyectos", projects_subtitle: "Algunos de mis proyectos, en vivo. Desliza en horizontal y entra a cualquiera.",
                     projects_loading: "Cargando proyectos desde GitHub…", projects_all: "Ver todos en GitHub ↗",
                     contact_eyebrow: "Hablemos",
                     contact_title: "Ponte en Contacto", contact_subtitle: "Puedes contactarme directamente a través de los siguientes medios:", contact_phone: "WhatsApp / Teléfono",
@@ -1039,7 +1064,7 @@
                     skills_title: "My Skills", skills_ae_title: "HTML5 &amp; CSS3", skills_ae_desc: "Semantic, responsive and accessible markup. Modern layouts with Flexbox, Grid and Tailwind.", skills_pr_title: "JavaScript", skills_pr_desc: "Client-side interactivity and logic with modern JavaScript (ES6+) and browser APIs.",
                     skills_ps_title: "React &amp; Frameworks", skills_ps_desc: "Dynamic web apps with React and reusable, scalable, maintainable components.", skills_ai_title: "Web Animation &amp; UI/UX", skills_ai_desc: "Fluid interfaces and animations with GSAP, Three.js and WebGL for immersive experiences.",
                     projects_eyebrow: "Selected work",
-                    projects_title: "Projects", projects_subtitle: "Real projects pulled live from my GitHub. Each card links to the demo and the code.",
+                    projects_title: "Projects", projects_subtitle: "A few of my projects, live. Scroll horizontally and open any of them.",
                     projects_loading: "Loading projects from GitHub…", projects_all: "See all on GitHub ↗",
                     contact_eyebrow: "Let's talk",
                     contact_title: "Get In Touch", contact_subtitle: "You can reach me directly via the following means:", contact_phone: "WhatsApp / Phone",
@@ -1328,41 +1353,36 @@
             }, { passive: true });
             updateProgress();
 
-            // --- PROYECTOS: conectados EN VIVO a GitHub ---
-            (function loadGitHubProjects() {
-                const grid = document.getElementById('gh-projects');
-                if (!grid) return;
-                const USER = 'Alexandrade-s-o';
-                const EXCLUDE = new Set(['Alex-Andrade', 'alex-andrade-perfil', 'portafolio', 'Alexandrade.github.io', 'Alexandrade-s-o']);
-                const prettify = (s) => s.replace(/[-_]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()).trim();
-                const typeByLang = { JavaScript: 'Aplicación web', TypeScript: 'Aplicación web', HTML: 'Sitio web', CSS: 'Sitio web', Python: 'Proyecto en Python', Vue: 'Aplicación web' };
-                const esc = (s) => (s == null ? '' : String(s)).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+            // --- PROYECTOS: carrusel HORIZONTAL con preview de cada web ---
+            (function renderProjects() {
+                const scroller = document.getElementById('gh-projects');
+                if (!scroller) return;
+                const projects = [
+                    { name: 'Casa Azul', url: 'https://casa-azul-nine.vercel.app/' },
+                    { name: 'Solidar', url: 'https://solidhar-beta.vercel.app/' },
+                    { name: 'Boskes', url: 'https://boskes.vercel.app/' },
+                    { name: 'Cromia', url: 'https://cromia-khaki.vercel.app/' },
+                    { name: 'Malezarap', url: 'https://malezarap.vercel.app/' }
+                ];
+                const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+                const shot1 = (u) => 'https://image.thum.io/get/width/720/crop/600/noanimate/' + u;
+                const shot2 = (u) => 'https://s.wordpress.com/mshots/v1/' + encodeURIComponent(u) + '?w=720';
+                scroller.innerHTML = projects.map((p) => {
+                    const u = esc(p.url), n = esc(p.name);
+                    // Si el primer screenshot falla, intenta otro; si también falla, deja el degradado de fondo.
+                    const onerr = 'this.onerror=function(){this.style.display=\'none\'};this.src=\'' + shot2(p.url) + '\'';
+                    return '<a class="proj-card" href="' + u + '" target="_blank" rel="noopener" aria-label="' + n + '">' +
+                        '<div class="proj-preview"><img loading="lazy" alt="Vista previa de ' + n + '" src="' + shot1(p.url) + '" onerror="' + onerr + '"></div>' +
+                        '<div class="proj-body"><h3 class="gh-name">' + n + '</h3><span class="proj-link">Ver sitio ↗</span></div>' +
+                        '</a>';
+                }).join('');
 
-                function render(repos) {
-                    const list = repos
-                        .filter((r) => !r.fork && !EXCLUDE.has(r.name) && r.homepage)
-                        .sort((a, b) => new Date(b.pushed_at) - new Date(a.pushed_at))
-                        .slice(0, 9);
-                    if (!list.length) { grid.innerHTML = '<p class="text-muted">No hay proyectos públicos con demo todavía.</p>'; return; }
-                    grid.innerHTML = list.map((r) => {
-                        const desc = r.description ? esc(r.description) : ((typeByLang[r.language] || 'Proyecto web') + ' desplegado en vivo — abre la demo para verlo.');
-                        const lang = esc(r.language || 'Web');
-                        const demo = r.homepage ? '<a href="' + esc(r.homepage) + '" target="_blank" rel="noopener">Demo ↗</a>' : '';
-                        return '<article class="gh-card">' +
-                            '<div class="gh-meta"><span class="gh-dot"></span><span>' + lang + '</span></div>' +
-                            '<h3 class="gh-name">' + esc(prettify(r.name)) + '</h3>' +
-                            '<p class="gh-desc">' + desc + '</p>' +
-                            '<div class="gh-links">' + demo + '<a href="' + esc(r.html_url) + '" target="_blank" rel="noopener">Código ↗</a></div>' +
-                            '</article>';
-                    }).join('');
-                }
-
-                fetch('https://api.github.com/users/' + USER + '/repos?per_page=100&sort=updated')
-                    .then((res) => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
-                    .then(render)
-                    .catch(() => {
-                        grid.innerHTML = '<p class="text-muted">No se pudieron cargar los proyectos ahora mismo. Visita <a class="text-accent" href="https://github.com/' + USER + '" target="_blank" rel="noopener">github.com/' + USER + '</a>.</p>';
-                    });
+                // Flechas de desplazamiento horizontal (visibles en desktop)
+                const step = () => Math.min(scroller.clientWidth * 0.9, 400);
+                const prev = document.querySelector('.proj-prev');
+                const next = document.querySelector('.proj-next');
+                if (prev) prev.addEventListener('click', () => scroller.scrollBy({ left: -step(), behavior: 'smooth' }));
+                if (next) next.addEventListener('click', () => scroller.scrollBy({ left: step(), behavior: 'smooth' }));
             })();
         });
     </script>
