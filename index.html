@@ -1148,6 +1148,7 @@
                 const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.9));
                 heroParallax.style.transform = 'perspective(1100px) translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 30).toFixed(1) + 'px,' + (-hp * 600).toFixed(0) + 'px) rotateX(' + (hp * 6).toFixed(1) + 'deg)';
                 heroParallax.style.opacity = (1 - hp * 0.9).toFixed(3);
+                heroParallax.style.filter = hp > 0.02 ? 'blur(' + (hp * hp * 5).toFixed(2) + 'px)' : 'none'; // profundidad de campo al alejarse
             }
             if (heroSection && !heroReduceMotion) {
                 if (heroParallax) heroParallax.style.willChange = 'transform, opacity';
@@ -1172,28 +1173,43 @@
             // sección es parte de la experiencia 3D inmersiva.
             const parallaxLayers = [];
             function docTop(el) { let y = 0, n = el; while (n) { y += n.offsetTop; n = n.offsetParent; } return y; }
+            const dofMobile = window.matchMedia('(max-width: 640px)').matches;
             function addSectionDepth(selector, cfg) {
                 cfg = cfg || {};
                 document.querySelectorAll(selector).forEach((el) => {
-                    el.style.willChange = 'transform';
+                    el.style.willChange = 'transform, filter, opacity';
                     el.style.transformOrigin = '50% 50%';
-                    parallaxLayers.push({ el: el, z: cfg.z || 680, tilt: cfg.tilt || 16, persp: cfg.persp || 1200 });
+                    parallaxLayers.push({
+                        el: el,
+                        z: cfg.z || 900,
+                        tilt: cfg.tilt || 0,
+                        persp: cfg.persp || 1100,
+                        blur: cfg.blur != null ? cfg.blur : (dofMobile ? 2.5 : 6)
+                    });
                 });
             }
             if (!heroReduceMotion) {
                 addSectionDepth('#about, #skills, #projects, #contact');
             }
+            // SCROLL CON PROFUNDIDAD DE CAMPO (eje Z): la sección enfocada está al FRENTE y
+            // nítida; al hacer scroll se va HACIA ATRÁS y se desenfoca (depth of field), y la
+            // siguiente llega desde el fondo. Movimiento de adelante hacia atrás en profundidad.
             function applyParallaxLayers() {
                 const vh = window.innerHeight;
                 for (let i = 0; i < parallaxLayers.length; i++) {
                     const L = parallaxLayers[i];
-                    // 'rel' a partir de la posición de LAYOUT (no del rect transformado) -> sin realimentación
+                    // 'rel' desde la posición de LAYOUT (no del rect transformado) -> sin realimentación
                     const center = docTop(L.el) + L.el.offsetHeight / 2 - window.scrollY;
                     let rel = (center - vh / 2) / vh;
-                    rel = Math.max(-0.9, Math.min(0.9, rel));
-                    const z = (-Math.abs(rel) * L.z).toFixed(0); // se aleja (recede) cuando no está centrada
-                    const rx = (rel * L.tilt).toFixed(2);         // se inclina al entrar/salir
-                    L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + z + 'px) rotateX(' + rx + 'deg)';
+                    rel = Math.max(-1, Math.min(1, rel));
+                    const d = Math.abs(rel);
+                    const focus = Math.max(0, (d - 0.2) / 0.8); // 0 = en foco (zona nítida central)
+                    const z = (-focus * L.z).toFixed(0);         // se va hacia atrás al perder foco
+                    const blur = (focus * focus * L.blur).toFixed(2); // PROFUNDIDAD DE CAMPO
+                    const rx = L.tilt ? ' rotateX(' + (rel * L.tilt).toFixed(2) + 'deg)' : '';
+                    L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + z + 'px)' + rx;
+                    L.el.style.filter = focus > 0.01 ? 'blur(' + blur + 'px)' : 'none';
+                    L.el.style.opacity = (1 - focus * 0.4).toFixed(3);
                 }
             }
 
