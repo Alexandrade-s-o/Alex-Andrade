@@ -499,27 +499,34 @@
     <!-- Three.js para la animación 3D de fondo (copia local, sin depender de CDN) -->
     <script src="vendor/three.min.js"></script>
     <script>
-        // --- FONDO: GRADIENTE FLUIDO ANIMADO (shader GLSL) ---
-        // Aurora líquida de ruido orgánico en azul/cian/índigo. Reactiva al mouse y
-        // al scroll, adaptada a tema oscuro/claro. Diseño digital, suave y vistoso.
+        // --- FONDO 3D INMERSIVO: nebulosa de aurora + campo de estrellas en warp + núcleo neuronal ---
+        // Dos pasadas de render: (1) shader de aurora líquida como telón de fondo a pantalla
+        // completa, y (2) una escena 3D real con cámara en perspectiva, partículas con
+        // profundidad (parallax + efecto warp) y un núcleo icosaédrico que reacciona al mouse,
+        // al scroll y al giroscopio. Adaptado a tema y a "prefers-reduced-motion".
         (function initBackground() {
             const canvas = document.getElementById('bg-canvas-3d');
             if (!canvas || typeof THREE === 'undefined') return;
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isMobile = window.innerWidth < 768;
 
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
-            const setDPR = () => renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 0.85 : 1.25));
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !isMobile, powerPreference: 'high-performance' });
+            const setDPR = () => renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.75));
             setDPR();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.autoClear = false;
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.Camera();
+            let isDark = (document.documentElement.dataset.theme || 'dark') === 'dark';
+
+            // ===== PASADA 1: telón de aurora (shader a pantalla completa) =====
+            const bgScene = new THREE.Scene();
+            const bgCam = new THREE.Camera();
 
             const uniforms = {
                 u_time:   { value: 0 },
                 u_res:    { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
                 u_mouse:  { value: new THREE.Vector2(0.5, 0.5) },
-                u_dark:   { value: (document.documentElement.dataset.theme || 'dark') === 'dark' ? 1.0 : 0.0 },
+                u_dark:   { value: isDark ? 1.0 : 0.0 },
                 u_scroll: { value: 0.0 }
             };
 
@@ -568,30 +575,153 @@
                 '}'
             ].join('\n');
 
-            const material = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vert, fragmentShader: frag, depthTest: false, depthWrite: false });
-            const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-            scene.add(quad);
+            const bgMat = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vert, fragmentShader: frag, depthTest: false, depthWrite: false });
+            bgScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat));
 
+            // ===== PASADA 2: espacio 3D real (perspectiva) =====
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 3000);
+            camera.position.set(0, 0, 420);
+            scene.fog = new THREE.FogExp2(0x05070d, 0.00042);
+
+            // Sprite circular suave para dar brillo a las partículas
+            function makeDot() {
+                const c = document.createElement('canvas'); c.width = c.height = 64;
+                const g = c.getContext('2d');
+                const rg = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+                rg.addColorStop(0, 'rgba(255,255,255,1)');
+                rg.addColorStop(0.25, 'rgba(255,255,255,0.85)');
+                rg.addColorStop(1, 'rgba(255,255,255,0)');
+                g.fillStyle = rg; g.fillRect(0, 0, 64, 64);
+                return new THREE.CanvasTexture(c);
+            }
+            const dotTex = makeDot();
+
+            // --- Campo de estrellas con profundidad (efecto warp hacia la cámara) ---
+            const STAR_COUNT = isMobile ? 900 : 2200;
+            const FIELD = 1500, DEPTH = 2400, NEAR_Z = 200;
+            const sPos = new Float32Array(STAR_COUNT * 3);
+            const sCol = new Float32Array(STAR_COUNT * 3);
+            const sSpd = new Float32Array(STAR_COUNT);
+            const palette = [new THREE.Color(0x5b8cff), new THREE.Color(0x22d3ee), new THREE.Color(0x8b5cf6), new THREE.Color(0xffffff)];
+            for (let i = 0; i < STAR_COUNT; i++) {
+                sPos[i * 3]     = (Math.random() - 0.5) * FIELD;
+                sPos[i * 3 + 1] = (Math.random() - 0.5) * FIELD;
+                sPos[i * 3 + 2] = NEAR_Z - Math.random() * DEPTH;
+                const col = palette[(Math.random() * palette.length) | 0];
+                sCol[i * 3] = col.r; sCol[i * 3 + 1] = col.g; sCol[i * 3 + 2] = col.b;
+                sSpd[i] = 0.4 + Math.random() * 1.6;
+            }
+            const starGeo = new THREE.BufferGeometry();
+            starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+            starGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
+            const starMat = new THREE.PointsMaterial({ size: isMobile ? 5 : 6.5, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
+            const stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
+
+            // --- Núcleo "neuronal": icosaedro en wireframe + vértices con brillo ---
+            const core = new THREE.Group();
+            const icoGeo = new THREE.IcosahedronGeometry(155, 1);
+            const wire = new THREE.LineSegments(
+                new THREE.WireframeGeometry(icoGeo),
+                new THREE.LineBasicMaterial({ color: 0x5b8cff, transparent: true, depthWrite: false })
+            );
+            const vMat = new THREE.PointsMaterial({ size: 18, map: dotTex, color: 0x22d3ee, transparent: true, depthWrite: false, sizeAttenuation: true });
+            core.add(wire);
+            core.add(new THREE.Points(icoGeo, vMat));
+            core.position.z = -150;
+            scene.add(core);
+
+            // ===== TEMA (claro / oscuro) =====
+            function applyTheme(dark) {
+                isDark = dark;
+                uniforms.u_dark.value = dark ? 1.0 : 0.0;
+                renderer.setClearColor(dark ? 0x05070d : 0xf7f9fc, 1);
+                scene.fog.color.set(dark ? 0x05070d : 0xeaf0f8);
+                starMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
+                starMat.color.set(dark ? 0xffffff : 0x3b5bb5);
+                starMat.opacity = dark ? 0.95 : 0.6;
+                starMat.needsUpdate = true;
+                wire.material.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
+                wire.material.color.set(dark ? 0x5b8cff : 0x2563eb);
+                wire.material.opacity = dark ? 0.5 : 0.28;
+                wire.material.needsUpdate = true;
+                vMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
+                vMat.color.set(dark ? 0x22d3ee : 0x2563eb);
+                vMat.opacity = dark ? 0.9 : 0.5;
+                vMat.needsUpdate = true;
+            }
+            applyTheme(isDark);
+            window.__setNeuralTheme = function (d) { applyTheme(!!d); }; // hook del botón de tema
+
+            // ===== INTERACCIÓN: mouse, scroll y giroscopio =====
             const targetMouse = new THREE.Vector2(0.5, 0.5);
+            const targetRot = { x: 0, y: 0 };
+            const curRot = { x: 0, y: 0 };
             window.addEventListener('pointermove', function (e) {
-                targetMouse.set(e.clientX / window.innerWidth, 1.0 - e.clientY / window.innerHeight);
+                const nx = e.clientX / window.innerWidth, ny = e.clientY / window.innerHeight;
+                targetMouse.set(nx, 1.0 - ny);
+                targetRot.y = nx - 0.5;
+                targetRot.x = ny - 0.5;
             }, { passive: true });
 
             let scrollP = 0;
             window.addEventListener('scroll', function () {
                 const mx = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-                scrollP = window.scrollY / mx;
+                scrollP = Math.min(1, window.scrollY / mx);
             }, { passive: true });
 
-            // Hook usado por el botón de tema
-            window.__setNeuralTheme = function (isDark) { uniforms.u_dark.value = isDark ? 1.0 : 0.0; };
+            if (isMobile) {
+                window.addEventListener('deviceorientation', function (e) {
+                    if (e.gamma == null || e.beta == null) return;
+                    targetRot.y = Math.max(-0.6, Math.min(0.6, e.gamma / 45));
+                    targetRot.x = Math.max(-0.6, Math.min(0.6, (e.beta - 50) / 45));
+                }, { passive: true });
+            }
 
+            // ===== BUCLE DE ANIMACIÓN (dos pasadas) =====
             const clock = new THREE.Clock();
+            let time = 0;
             function frame() {
-                uniforms.u_time.value = clock.getElapsedTime();
+                const dt = Math.min(clock.getDelta(), 0.05);
+                time += dt;
+                uniforms.u_time.value = time;
                 uniforms.u_mouse.value.lerp(targetMouse, 0.04);
                 uniforms.u_scroll.value += (scrollP - uniforms.u_scroll.value) * 0.05;
+
+                // Warp: las estrellas avanzan hacia la cámara y reaparecen al fondo
+                const arr = starGeo.attributes.position.array;
+                const warp = 1.0 + scrollP * 4.0;
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    arr[i * 3 + 2] += sSpd[i] * warp;
+                    if (arr[i * 3 + 2] > camera.position.z) {
+                        arr[i * 3 + 2] = NEAR_Z - DEPTH;
+                        arr[i * 3]     = (Math.random() - 0.5) * FIELD;
+                        arr[i * 3 + 1] = (Math.random() - 0.5) * FIELD;
+                    }
+                }
+                starGeo.attributes.position.needsUpdate = true;
+                stars.rotation.z += dt * 0.01;
+
+                // Núcleo: rotación, leve flotación y retroceso al hacer scroll
+                core.rotation.y += dt * 0.12;
+                core.rotation.x += dt * 0.05;
+                core.position.y = Math.sin(time * 0.4) * 12;
+                core.position.z = -150 - scrollP * 600;
+                core.scale.setScalar(Math.max(0.2, 1 - scrollP * 0.4));
+
+                // Cámara: mira hacia el cursor/giroscopio (look-around inmersivo)
+                curRot.x += (targetRot.x - curRot.x) * 0.05;
+                curRot.y += (targetRot.y - curRot.y) * 0.05;
+                camera.position.x = curRot.y * 130;
+                camera.position.y = -curRot.x * 130;
+                camera.lookAt(0, 0, -150);
+
+                renderer.clear();
+                renderer.render(bgScene, bgCam);
+                renderer.clearDepth();
                 renderer.render(scene, camera);
+
                 if (!reduceMotion) requestAnimationFrame(frame);
             }
             frame();
@@ -600,6 +730,8 @@
                 setDPR();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 uniforms.u_res.value.set(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
             });
         })();
     </script>
