@@ -578,11 +578,10 @@
             const bgMat = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vert, fragmentShader: frag, depthTest: false, depthWrite: false });
             bgScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat));
 
-            // ===== PASADA 2: espacio 3D real (perspectiva) =====
+            // ===== PASADA 2: PANORAMA 3D — viaje de cámara guiado por el scroll =====
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 3000);
-            camera.position.set(0, 0, 420);
-            scene.fog = new THREE.FogExp2(0x05070d, 0.00042);
+            const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 6000);
+            scene.fog = new THREE.FogExp2(0x05070d, 0.00035);
 
             // Sprite circular suave para dar brillo a las partículas
             function makeDot() {
@@ -596,10 +595,27 @@
                 return new THREE.CanvasTexture(c);
             }
             const dotTex = makeDot();
+            const smoothstep = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 
-            // --- Campo de estrellas con profundidad (efecto warp hacia la cámara) ---
-            const STAR_COUNT = isMobile ? 900 : 2200;
-            const FIELD = 1500, DEPTH = 2400, NEAR_Z = 200;
+            // Ruta curva de la cámara a través del corredor 3D (define el panorama)
+            const TRAVEL = 4800;
+            function pathAt(t, out) {
+                return out.set(
+                    Math.sin(t * Math.PI * 2.2) * 280,
+                    Math.sin(t * Math.PI * 1.6 + 0.5) * 170,
+                    420 - t * TRAVEL
+                );
+            }
+
+            // Materiales con tema (claro/oscuro): guardan color y opacidad para cada modo
+            const themeMats = [];
+            function tMat(m, d, l, od, ol) { m.userData = { d: d, l: l, od: od, ol: ol, baseOpacity: od }; themeMats.push(m); return m; }
+            const lineMat = (d, l, od, ol) => tMat(new THREE.LineBasicMaterial({ transparent: true, depthWrite: false }), d, l, od, ol);
+            const glowMat = (d, l, size, od, ol) => tMat(new THREE.PointsMaterial({ size: size, map: dotTex, transparent: true, depthWrite: false, sizeAttenuation: true }), d, l, od, ol);
+
+            // --- Campo de estrellas envolvente e infinito (siempre rodea la cámara) ---
+            const STAR_COUNT = isMobile ? 1000 : 2400;
+            const FIELD = 1700, SPAN = 3000;
             const sPos = new Float32Array(STAR_COUNT * 3);
             const sCol = new Float32Array(STAR_COUNT * 3);
             const sSpd = new Float32Array(STAR_COUNT);
@@ -607,30 +623,103 @@
             for (let i = 0; i < STAR_COUNT; i++) {
                 sPos[i * 3]     = (Math.random() - 0.5) * FIELD;
                 sPos[i * 3 + 1] = (Math.random() - 0.5) * FIELD;
-                sPos[i * 3 + 2] = NEAR_Z - Math.random() * DEPTH;
+                sPos[i * 3 + 2] = (Math.random() - 0.5) * SPAN;
                 const col = palette[(Math.random() * palette.length) | 0];
                 sCol[i * 3] = col.r; sCol[i * 3 + 1] = col.g; sCol[i * 3 + 2] = col.b;
-                sSpd[i] = 0.4 + Math.random() * 1.6;
+                sSpd[i] = 0.6 + Math.random() * 1.8;
             }
             const starGeo = new THREE.BufferGeometry();
             starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
             starGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
             const starMat = new THREE.PointsMaterial({ size: isMobile ? 5 : 6.5, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
             const stars = new THREE.Points(starGeo, starMat);
+            stars.frustumCulled = false;
             scene.add(stars);
 
-            // --- Núcleo "neuronal": icosaedro en wireframe + vértices con brillo ---
-            const core = new THREE.Group();
-            const icoGeo = new THREE.IcosahedronGeometry(155, 1);
-            const wire = new THREE.LineSegments(
-                new THREE.WireframeGeometry(icoGeo),
-                new THREE.LineBasicMaterial({ color: 0x5b8cff, transparent: true, depthWrite: false })
-            );
-            const vMat = new THREE.PointsMaterial({ size: 18, map: dotTex, color: 0x22d3ee, transparent: true, depthWrite: false, sizeAttenuation: true });
-            core.add(wire);
-            core.add(new THREE.Points(icoGeo, vMat));
-            core.position.z = -150;
-            scene.add(core);
+            // --- ESTACIONES del viaje: una estructura 3D por sección ---
+            const landmarks = [];
+            function reg(group, t, update) {
+                group.userData.t = t;
+                group.userData.update = update;
+                group.position.copy(pathAt(t, new THREE.Vector3()));
+                landmarks.push(group);
+                scene.add(group);
+            }
+
+            // Estación 0 — Núcleo neuronal (Inicio)
+            (function () {
+                const g = new THREE.Group();
+                const geo = new THREE.IcosahedronGeometry(150, 1);
+                g.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(0x5b8cff, 0x2563eb, 0.55, 0.30)));
+                g.add(new THREE.Points(geo, glowMat(0x22d3ee, 0x2563eb, 18, 0.90, 0.50)));
+                reg(g, 0.06, (time) => { g.rotation.y = time * 0.15; g.rotation.x = time * 0.07; });
+            })();
+
+            // Estación 1 — Portal (Sobre mí): dos anillos que la cámara atraviesa
+            (function () {
+                const g = new THREE.Group();
+                const r1 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(270, 7, 8, 64)), lineMat(0x22d3ee, 0x0891b2, 0.50, 0.30));
+                const r2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(185, 5, 6, 50)), lineMat(0x8b5cf6, 0x7c3aed, 0.46, 0.28));
+                g.add(r1, r2);
+                reg(g, 0.28, (time) => { r1.rotation.z = time * 0.20; r2.rotation.z = -time * 0.30; r2.rotation.x = time * 0.15; });
+            })();
+
+            // Estación 2 — Constelación de habilidades (Habilidades): 4 nodos en anillo
+            (function () {
+                const g = new THREE.Group();
+                const geo = new THREE.OctahedronGeometry(46, 0);
+                const hd = [0xf97316, 0xeab308, 0x06b6d4, 0x3b82f6];
+                const hl = [0xea580c, 0xca8a04, 0x0891b2, 0x2563eb];
+                const nodes = [];
+                for (let k = 0; k < 4; k++) {
+                    const ang = k / 4 * Math.PI * 2;
+                    const n = new THREE.Group();
+                    n.position.set(Math.cos(ang) * 230, Math.sin(ang) * 150, 0);
+                    n.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(hd[k], hl[k], 0.60, 0.32)));
+                    n.add(new THREE.Points(geo, glowMat(hd[k], hl[k], 14, 0.90, 0.50)));
+                    g.add(n); nodes.push(n);
+                }
+                reg(g, 0.50, (time) => { g.rotation.z = time * 0.10; nodes.forEach((n, i) => { n.rotation.y = time * 0.5 + i; n.rotation.x = time * 0.4; }); });
+            })();
+
+            // Estación 3 — Galería de proyectos (Proyectos): paneles flotantes
+            (function () {
+                const g = new THREE.Group();
+                const edges = new THREE.EdgesGeometry(new THREE.PlaneGeometry(220, 130));
+                for (let k = 0; k < 5; k++) {
+                    const ang = k / 5 * Math.PI * 2;
+                    const panel = new THREE.LineSegments(edges, lineMat(0x5b8cff, 0x2563eb, 0.50, 0.30));
+                    panel.position.set(Math.cos(ang) * 300, Math.sin(ang) * 185, (k - 2) * 45);
+                    panel.rotation.z = ang;
+                    g.add(panel);
+                }
+                reg(g, 0.72, (time) => { g.rotation.z = -time * 0.08; });
+            })();
+
+            // Estación 4 — Faro de contacto (Contacto): esfera de puntos + anillo
+            (function () {
+                const g = new THREE.Group();
+                const ball = new THREE.Points(new THREE.IcosahedronGeometry(58, 3), glowMat(0x22d3ee, 0x2563eb, 10, 0.95, 0.60));
+                const ring = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(140, 4, 6, 50)), lineMat(0x5b8cff, 0x2563eb, 0.60, 0.34));
+                g.add(ball, ring);
+                reg(g, 0.93, (time) => { ball.rotation.y = time * 0.30; ring.rotation.x = time * 0.40; ring.rotation.z = time * 0.20; ball.scale.setScalar(1 + Math.sin(time * 2) * 0.06); });
+            })();
+
+            // Alinea cada estación con el centro real de su sección (scrollytelling)
+            const SECTION_IDS = ['home', 'about', 'skills', 'projects', 'contact'];
+            function computeStations() {
+                const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+                SECTION_IDS.forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    if (el && landmarks[i]) {
+                        const c = el.offsetTop + el.offsetHeight * 0.5 - window.innerHeight * 0.5;
+                        const t = Math.max(0, Math.min(1, c / max));
+                        landmarks[i].userData.t = t;
+                        landmarks[i].position.copy(pathAt(t, new THREE.Vector3()));
+                    }
+                });
+            }
+            computeStations();
 
             // ===== TEMA (claro / oscuro) =====
             function applyTheme(dark) {
@@ -642,14 +731,13 @@
                 starMat.color.set(dark ? 0xffffff : 0x3b5bb5);
                 starMat.opacity = dark ? 0.95 : 0.6;
                 starMat.needsUpdate = true;
-                wire.material.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
-                wire.material.color.set(dark ? 0x5b8cff : 0x2563eb);
-                wire.material.opacity = dark ? 0.5 : 0.28;
-                wire.material.needsUpdate = true;
-                vMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
-                vMat.color.set(dark ? 0x22d3ee : 0x2563eb);
-                vMat.opacity = dark ? 0.9 : 0.5;
-                vMat.needsUpdate = true;
+                themeMats.forEach((m) => {
+                    m.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
+                    m.color.set(dark ? m.userData.d : m.userData.l);
+                    m.userData.baseOpacity = dark ? m.userData.od : m.userData.ol;
+                    m.opacity = m.userData.baseOpacity;
+                    m.needsUpdate = true;
+                });
             }
             applyTheme(isDark);
             window.__setNeuralTheme = function (d) { applyTheme(!!d); }; // hook del botón de tema
@@ -679,52 +767,71 @@
                 }, { passive: true });
             }
 
-            // ===== BUCLE DE ANIMACIÓN (dos pasadas) =====
+            // ===== RENDER: viaje guiado por el scroll (dos pasadas) =====
             const clock = new THREE.Clock();
-            let time = 0;
-            function frame() {
+            const camPos = new THREE.Vector3(), lookPos = new THREE.Vector3();
+            const camLead = 0.035;
+            let time = 0, sP = 0;
+            function draw() {
                 const dt = Math.min(clock.getDelta(), 0.05);
-                time += dt;
+                if (!reduceMotion) time += dt;
+                sP += (scrollP - sP) * (reduceMotion ? 1 : 0.08);
+
                 uniforms.u_time.value = time;
                 uniforms.u_mouse.value.lerp(targetMouse, 0.04);
-                uniforms.u_scroll.value += (scrollP - uniforms.u_scroll.value) * 0.05;
+                uniforms.u_scroll.value += (sP - uniforms.u_scroll.value) * (reduceMotion ? 1 : 0.06);
 
-                // Warp: las estrellas avanzan hacia la cámara y reaparecen al fondo
+                // Cámara: vuela por la ruta mirando hacia adelante + parallax del mouse
+                curRot.x += (targetRot.x - curRot.x) * 0.06;
+                curRot.y += (targetRot.y - curRot.y) * 0.06;
+                const offX = curRot.y * 120, offY = -curRot.x * 120;
+                pathAt(sP - camLead, camPos);
+                pathAt(sP - camLead + 0.05, lookPos);
+                camera.position.set(camPos.x + offX, camPos.y + offY, camPos.z);
+                camera.lookAt(lookPos.x + offX * 0.5, lookPos.y + offY * 0.5, lookPos.z);
+
+                // Estrellas: deriva warp + envoltura infinita alrededor de la cámara
                 const arr = starGeo.attributes.position.array;
-                const warp = 1.0 + scrollP * 4.0;
+                const cx = camera.position.x, cy = camera.position.y, cz = camera.position.z;
                 for (let i = 0; i < STAR_COUNT; i++) {
-                    arr[i * 3 + 2] += sSpd[i] * warp;
-                    if (arr[i * 3 + 2] > camera.position.z) {
-                        arr[i * 3 + 2] = NEAR_Z - DEPTH;
-                        arr[i * 3]     = (Math.random() - 0.5) * FIELD;
-                        arr[i * 3 + 1] = (Math.random() - 0.5) * FIELD;
-                    }
+                    if (!reduceMotion) arr[i * 3 + 2] += sSpd[i];
+                    const dz = arr[i * 3 + 2] - cz;
+                    if (dz > SPAN * 0.5) arr[i * 3 + 2] -= SPAN; else if (dz < -SPAN * 0.5) arr[i * 3 + 2] += SPAN;
+                    const dx = arr[i * 3] - cx;
+                    if (dx > FIELD * 0.5) arr[i * 3] -= FIELD; else if (dx < -FIELD * 0.5) arr[i * 3] += FIELD;
+                    const dy = arr[i * 3 + 1] - cy;
+                    if (dy > FIELD * 0.5) arr[i * 3 + 1] -= FIELD; else if (dy < -FIELD * 0.5) arr[i * 3 + 1] += FIELD;
                 }
                 starGeo.attributes.position.needsUpdate = true;
-                stars.rotation.z += dt * 0.01;
 
-                // Núcleo: rotación, leve flotación y retroceso al hacer scroll
-                core.rotation.y += dt * 0.12;
-                core.rotation.x += dt * 0.05;
-                core.position.y = Math.sin(time * 0.4) * 12;
-                core.position.z = -150 - scrollP * 600;
-                core.scale.setScalar(Math.max(0.2, 1 - scrollP * 0.4));
-
-                // Cámara: mira hacia el cursor/giroscopio (look-around inmersivo)
-                curRot.x += (targetRot.x - curRot.x) * 0.05;
-                curRot.y += (targetRot.y - curRot.y) * 0.05;
-                camera.position.x = curRot.y * 130;
-                camera.position.y = -curRot.x * 130;
-                camera.lookAt(0, 0, -150);
+                // Estaciones: rotación viva + realce (focus) según la sección activa
+                for (let i = 0; i < landmarks.length; i++) {
+                    const g = landmarks[i];
+                    const f = 1 - smoothstep(0.0, 0.22, Math.abs(sP - g.userData.t));
+                    g.userData.update(time, f);
+                    g.scale.setScalar(0.7 + 0.4 * f);
+                    g.traverse(function (o) {
+                        if (o.material && o.material.userData && o.material.userData.baseOpacity != null) {
+                            o.material.opacity = o.material.userData.baseOpacity * (0.22 + 0.78 * f);
+                        }
+                    });
+                }
 
                 renderer.clear();
                 renderer.render(bgScene, bgCam);
                 renderer.clearDepth();
                 renderer.render(scene, camera);
-
-                if (!reduceMotion) requestAnimationFrame(frame);
             }
-            frame();
+
+            let scheduled = false;
+            function schedule() { if (scheduled) return; scheduled = true; requestAnimationFrame(function () { scheduled = false; draw(); }); }
+            if (!reduceMotion) {
+                (function loop() { draw(); requestAnimationFrame(loop); })();
+            } else {
+                draw();
+                window.addEventListener('scroll', schedule, { passive: true });
+                window.addEventListener('pointermove', schedule, { passive: true });
+            }
 
             window.addEventListener('resize', function () {
                 setDPR();
@@ -732,6 +839,8 @@
                 uniforms.u_res.value.set(window.innerWidth, window.innerHeight);
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
+                computeStations();
+                if (reduceMotion) draw();
             });
         })();
     </script>
