@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alex Andrade - Desarrollador Multimedia Web</title>
     <!-- Tema (oscuro/claro) aplicado antes de pintar para evitar parpadeo -->
-    <script>(function () { try { document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; } })();</script>
+    <script>(function () { try { if (localStorage.getItem('themeReset2') !== '1') { localStorage.setItem('theme', 'light'); localStorage.setItem('themeReset2', '1'); } document.documentElement.dataset.theme = localStorage.getItem('theme') || 'light'; } catch (e) { document.documentElement.dataset.theme = 'light'; } })();</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +31,9 @@
             --tok-kw: #9333ea; --tok-var: #2563eb; --tok-prop: #0e7490;
             --tok-str: #15803d; --tok-punc: #0891b2; --tok-fn: #b45309; --tok-num: #c2410c;
             --card-shadow: 0 22px 48px -30px rgba(2, 6, 23, 0.40);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.12);
+            --glass-blur: 14px;
         }
         /* ===== TEMA OSCURO (Antigravity) ===== */
         :root[data-theme="dark"] {
@@ -49,6 +52,8 @@
             --tok-kw: #c792ea; --tok-var: #82aaff; --tok-prop: #7fdbca;
             --tok-str: #c3e88d; --tok-punc: #89ddff; --tok-fn: #ffcb6b; --tok-num: #f78c6c;
             --card-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
+            --glass-bg: rgba(11, 15, 24, 0.82);
+            --glass-border: rgba(255, 255, 255, 0.12);
         }
         html { transition: background-color 0.4s ease; }
 
@@ -97,6 +102,18 @@
             width: 100%;
             height: 100%;
             z-index: -1;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* Capa de "polvo" 3D POR DELANTE del contenido: el contenido queda dentro del 3D */
+        #fg-dust {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 40; /* por encima de las secciones, por debajo del header (z-50) */
             pointer-events: none;
             display: block;
         }
@@ -299,6 +316,67 @@
         .skill-card:hover .skill-icon-bg { background-color: var(--hover-color); }
         .skill-card:hover .skill-icon-text { color: white; }
 
+        /* ===== SECCIONES INMERSIVAS: tarjetas "glass" flotando en el espacio 3D ===== */
+        #skills .skill-card,
+        #projects .project-trigger,
+        #contact .bg-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--card-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            isolation: isolate;
+        }
+        /* Brillo (spotlight) que sigue al cursor dentro de la tarjeta */
+        #skills .skill-card,
+        #projects .project-trigger { position: relative; transform-style: preserve-3d; }
+        #skills .skill-card::before,
+        #projects .project-trigger::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), var(--spotlight), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+        #skills .skill-card:hover::before,
+        #projects .project-trigger:hover::before { opacity: 1; }
+        #skills .skill-card > *,
+        #projects .project-trigger > * { position: relative; z-index: 1; }
+
+        /* Foto de perfil: anillo de brillo + leve flotación (más presencia en el espacio) */
+        #about img { box-shadow: 0 0 0 4px var(--card), 0 0 70px -12px var(--accent); }
+        @media (prefers-reduced-motion: no-preference) {
+            #about img { animation: about-float 7s ease-in-out infinite; }
+        }
+        @keyframes about-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* Entrada "desde la profundidad": el contenido enfoca (desenfoque -> nítido) al revelarse */
+        .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale,
+        .reveal-stagger > * { filter: blur(7px); }
+        .reveal.visible, .reveal-up.visible, .reveal-left.visible, .reveal-right.visible,
+        .reveal-scale.visible, .reveal-stagger.visible > * { filter: blur(0); }
+        .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale {
+            transition: opacity 0.9s cubic-bezier(0.16, 0.84, 0.44, 1),
+                        transform 0.9s cubic-bezier(0.16, 0.84, 0.44, 1),
+                        filter 0.9s ease;
+        }
+        .reveal-stagger > * {
+            transition: opacity 0.8s cubic-bezier(0.16, 0.84, 0.44, 1),
+                        transform 0.8s cubic-bezier(0.16, 0.84, 0.44, 1),
+                        filter 0.8s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-up, .reveal-left, .reveal-right, .reveal-scale,
+            .reveal-stagger > * { filter: none !important; }
+            #about img { animation: none !important; }
+        }
+
         /* Modal */
         #project-modal { transition: opacity 0.3s ease; }
         #project-modal iframe { aspect-ratio: 16 / 9; }
@@ -311,6 +389,8 @@
 
     <!-- Canvas de animación 3D de fondo (Three.js) -->
     <canvas id="bg-canvas-3d"></canvas>
+    <!-- Capa de polvo 3D POR DELANTE del contenido (2D ligero) -->
+    <canvas id="fg-dust"></canvas>
 
     <!-- Header / Barra de Navegación -->
     <header id="header" class="sticky top-0 z-50 backdrop-blur-xl border-b border-card">
@@ -499,27 +579,34 @@
     <!-- Three.js para la animación 3D de fondo (copia local, sin depender de CDN) -->
     <script src="vendor/three.min.js"></script>
     <script>
-        // --- FONDO: GRADIENTE FLUIDO ANIMADO (shader GLSL) ---
-        // Aurora líquida de ruido orgánico en azul/cian/índigo. Reactiva al mouse y
-        // al scroll, adaptada a tema oscuro/claro. Diseño digital, suave y vistoso.
+        // --- FONDO 3D INMERSIVO: nebulosa de aurora + campo de estrellas en warp + núcleo neuronal ---
+        // Dos pasadas de render: (1) shader de aurora líquida como telón de fondo a pantalla
+        // completa, y (2) una escena 3D real con cámara en perspectiva, partículas con
+        // profundidad (parallax + efecto warp) y un núcleo icosaédrico que reacciona al mouse,
+        // al scroll y al giroscopio. Adaptado a tema y a "prefers-reduced-motion".
         (function initBackground() {
             const canvas = document.getElementById('bg-canvas-3d');
             if (!canvas || typeof THREE === 'undefined') return;
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isMobile = window.innerWidth < 768;
 
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false });
-            const setDPR = () => renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth < 768 ? 0.85 : 1.25));
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !isMobile, powerPreference: 'high-performance' });
+            const setDPR = () => renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.75));
             setDPR();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.autoClear = false;
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.Camera();
+            let isDark = (document.documentElement.dataset.theme || 'light') === 'dark';
+
+            // ===== PASADA 1: telón de aurora (shader a pantalla completa) =====
+            const bgScene = new THREE.Scene();
+            const bgCam = new THREE.Camera();
 
             const uniforms = {
                 u_time:   { value: 0 },
                 u_res:    { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
                 u_mouse:  { value: new THREE.Vector2(0.5, 0.5) },
-                u_dark:   { value: (document.documentElement.dataset.theme || 'dark') === 'dark' ? 1.0 : 0.0 },
+                u_dark:   { value: isDark ? 1.0 : 0.0 },
                 u_scroll: { value: 0.0 }
             };
 
@@ -568,39 +655,355 @@
                 '}'
             ].join('\n');
 
-            const material = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vert, fragmentShader: frag, depthTest: false, depthWrite: false });
-            const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
-            scene.add(quad);
+            const bgMat = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: vert, fragmentShader: frag, depthTest: false, depthWrite: false });
+            bgScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat));
 
+            // ===== PASADA 2: PANORAMA 3D — viaje de cámara guiado por el scroll =====
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 6000);
+            scene.fog = new THREE.FogExp2(0x05070d, 0.00035);
+
+            // Sprite circular suave para dar brillo a las partículas
+            function makeDot() {
+                const c = document.createElement('canvas'); c.width = c.height = 64;
+                const g = c.getContext('2d');
+                const rg = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+                rg.addColorStop(0, 'rgba(255,255,255,1)');
+                rg.addColorStop(0.25, 'rgba(255,255,255,0.85)');
+                rg.addColorStop(1, 'rgba(255,255,255,0)');
+                g.fillStyle = rg; g.fillRect(0, 0, 64, 64);
+                return new THREE.CanvasTexture(c);
+            }
+            const dotTex = makeDot();
+            const smoothstep = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+
+            // Ruta curva de la cámara a través del corredor 3D (define el panorama)
+            const TRAVEL = 4800;
+            function pathAt(t, out) {
+                return out.set(
+                    Math.sin(t * Math.PI * 2.2) * 280,
+                    Math.sin(t * Math.PI * 1.6 + 0.5) * 170,
+                    420 - t * TRAVEL
+                );
+            }
+
+            // Materiales con tema (claro/oscuro): guardan color y opacidad para cada modo
+            const themeMats = [];
+            function tMat(m, d, l, od, ol) { m.userData = { d: d, l: l, od: od, ol: ol, baseOpacity: od }; themeMats.push(m); return m; }
+            const lineMat = (d, l, od, ol) => tMat(new THREE.LineBasicMaterial({ transparent: true, depthWrite: false }), d, l, od, ol);
+            const glowMat = (d, l, size, od, ol) => tMat(new THREE.PointsMaterial({ size: size, map: dotTex, transparent: true, depthWrite: false, sizeAttenuation: true }), d, l, od, ol);
+
+            // --- Campo de estrellas envolvente e infinito (siempre rodea la cámara) ---
+            const STAR_COUNT = isMobile ? 1000 : 2400;
+            const FIELD = 1700, SPAN = 3000;
+            const sPos = new Float32Array(STAR_COUNT * 3);
+            const sCol = new Float32Array(STAR_COUNT * 3);
+            const sSpd = new Float32Array(STAR_COUNT);
+            const palette = [new THREE.Color(0x5b8cff), new THREE.Color(0x22d3ee), new THREE.Color(0x8b5cf6), new THREE.Color(0xffffff)];
+            for (let i = 0; i < STAR_COUNT; i++) {
+                sPos[i * 3]     = (Math.random() - 0.5) * FIELD;
+                sPos[i * 3 + 1] = (Math.random() - 0.5) * FIELD;
+                sPos[i * 3 + 2] = (Math.random() - 0.5) * SPAN;
+                const col = palette[(Math.random() * palette.length) | 0];
+                sCol[i * 3] = col.r; sCol[i * 3 + 1] = col.g; sCol[i * 3 + 2] = col.b;
+                sSpd[i] = 0.6 + Math.random() * 1.8;
+            }
+            const starGeo = new THREE.BufferGeometry();
+            starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+            starGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
+            const starMat = new THREE.PointsMaterial({ size: isMobile ? 5 : 6.5, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
+            const stars = new THREE.Points(starGeo, starMat);
+            stars.frustumCulled = false;
+            scene.add(stars);
+
+            // --- ESTACIONES del viaje: una estructura 3D por sección ---
+            const landmarks = [];
+            function reg(group, t, update) {
+                group.userData.t = t;
+                group.userData.update = update;
+                group.position.copy(pathAt(t, new THREE.Vector3()));
+                landmarks.push(group);
+                scene.add(group);
+            }
+
+            // Estación 0 — Núcleo neuronal (Inicio)
+            (function () {
+                const g = new THREE.Group();
+                const geo = new THREE.IcosahedronGeometry(150, 1);
+                g.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(0x5b8cff, 0x2563eb, 0.55, 0.30)));
+                g.add(new THREE.Points(geo, glowMat(0x22d3ee, 0x2563eb, 18, 0.90, 0.50)));
+                reg(g, 0.06, (time) => { g.rotation.y = time * 0.15; g.rotation.x = time * 0.07; });
+            })();
+
+            // Estación 1 — Portal (Sobre mí): dos anillos que la cámara atraviesa
+            (function () {
+                const g = new THREE.Group();
+                const r1 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(270, 7, 8, 64)), lineMat(0x22d3ee, 0x0891b2, 0.50, 0.30));
+                const r2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(185, 5, 6, 50)), lineMat(0x8b5cf6, 0x7c3aed, 0.46, 0.28));
+                g.add(r1, r2);
+                reg(g, 0.28, (time) => { r1.rotation.z = time * 0.20; r2.rotation.z = -time * 0.30; r2.rotation.x = time * 0.15; });
+            })();
+
+            // Estación 2 — Constelación de habilidades (Habilidades): 4 nodos en anillo
+            (function () {
+                const g = new THREE.Group();
+                const geo = new THREE.OctahedronGeometry(46, 0);
+                const hd = [0xf97316, 0xeab308, 0x06b6d4, 0x3b82f6];
+                const hl = [0xea580c, 0xca8a04, 0x0891b2, 0x2563eb];
+                const nodes = [];
+                for (let k = 0; k < 4; k++) {
+                    const ang = k / 4 * Math.PI * 2;
+                    const n = new THREE.Group();
+                    n.position.set(Math.cos(ang) * 230, Math.sin(ang) * 150, 0);
+                    n.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(hd[k], hl[k], 0.60, 0.32)));
+                    n.add(new THREE.Points(geo, glowMat(hd[k], hl[k], 14, 0.90, 0.50)));
+                    g.add(n); nodes.push(n);
+                }
+                reg(g, 0.50, (time) => { g.rotation.z = time * 0.10; nodes.forEach((n, i) => { n.rotation.y = time * 0.5 + i; n.rotation.x = time * 0.4; }); });
+            })();
+
+            // Estación 3 — Galería de proyectos (Proyectos): paneles flotantes
+            (function () {
+                const g = new THREE.Group();
+                const edges = new THREE.EdgesGeometry(new THREE.PlaneGeometry(220, 130));
+                for (let k = 0; k < 5; k++) {
+                    const ang = k / 5 * Math.PI * 2;
+                    const panel = new THREE.LineSegments(edges, lineMat(0x5b8cff, 0x2563eb, 0.50, 0.30));
+                    panel.position.set(Math.cos(ang) * 300, Math.sin(ang) * 185, (k - 2) * 45);
+                    panel.rotation.z = ang;
+                    g.add(panel);
+                }
+                reg(g, 0.72, (time) => { g.rotation.z = -time * 0.08; });
+            })();
+
+            // Estación 4 — Faro de contacto (Contacto): esfera de puntos + anillo
+            (function () {
+                const g = new THREE.Group();
+                const ball = new THREE.Points(new THREE.IcosahedronGeometry(58, 3), glowMat(0x22d3ee, 0x2563eb, 10, 0.95, 0.60));
+                const ring = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(140, 4, 6, 50)), lineMat(0x5b8cff, 0x2563eb, 0.60, 0.34));
+                g.add(ball, ring);
+                reg(g, 0.93, (time) => { ball.rotation.y = time * 0.30; ring.rotation.x = time * 0.40; ring.rotation.z = time * 0.20; ball.scale.setScalar(1 + Math.sin(time * 2) * 0.06); });
+            })();
+
+            // Alinea cada estación con el centro real de su sección (scrollytelling)
+            const SECTION_IDS = ['home', 'about', 'skills', 'projects', 'contact'];
+            function computeStations() {
+                const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+                SECTION_IDS.forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    if (el && landmarks[i]) {
+                        const c = el.offsetTop + el.offsetHeight * 0.5 - window.innerHeight * 0.5;
+                        const t = Math.max(0, Math.min(1, c / max));
+                        landmarks[i].userData.t = t;
+                        landmarks[i].position.copy(pathAt(t, new THREE.Vector3()));
+                    }
+                });
+            }
+            computeStations();
+
+            // ===== TEMA (claro / oscuro) =====
+            function applyTheme(dark) {
+                isDark = dark;
+                uniforms.u_dark.value = dark ? 1.0 : 0.0;
+                // Tema claro = FONDO BLANCO PLANO (sin nebulosa); tema oscuro = nebulosa espacial
+                renderer.setClearColor(dark ? 0x05070d : 0xf7f9fb, 1);
+                scene.fog.color.set(dark ? 0x05070d : 0xf7f9fb); // niebla = color del fondo -> profundidad sobre blanco
+                starMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
+                starMat.color.set(dark ? 0xffffff : 0x274690);
+                starMat.opacity = dark ? 0.95 : 0.55;
+                starMat.needsUpdate = true;
+                themeMats.forEach((m) => {
+                    m.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
+                    m.color.set(dark ? m.userData.d : m.userData.l);
+                    // En blanco, las líneas/figuras necesitan más opacidad para leerse bien
+                    m.userData.baseOpacity = dark ? m.userData.od : Math.min(0.92, m.userData.ol * 1.9);
+                    m.opacity = m.userData.baseOpacity;
+                    m.needsUpdate = true;
+                });
+            }
+            applyTheme(isDark);
+            window.__setNeuralTheme = function (d) { applyTheme(!!d); }; // hook del botón de tema
+
+            // ===== INTERACCIÓN: mouse, scroll y giroscopio =====
             const targetMouse = new THREE.Vector2(0.5, 0.5);
+            const targetRot = { x: 0, y: 0 };
+            const curRot = { x: 0, y: 0 };
             window.addEventListener('pointermove', function (e) {
-                targetMouse.set(e.clientX / window.innerWidth, 1.0 - e.clientY / window.innerHeight);
+                const nx = e.clientX / window.innerWidth, ny = e.clientY / window.innerHeight;
+                targetMouse.set(nx, 1.0 - ny);
+                targetRot.y = nx - 0.5;
+                targetRot.x = ny - 0.5;
             }, { passive: true });
 
             let scrollP = 0;
             window.addEventListener('scroll', function () {
                 const mx = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-                scrollP = window.scrollY / mx;
+                scrollP = Math.min(1, window.scrollY / mx);
             }, { passive: true });
 
-            // Hook usado por el botón de tema
-            window.__setNeuralTheme = function (isDark) { uniforms.u_dark.value = isDark ? 1.0 : 0.0; };
-
-            const clock = new THREE.Clock();
-            function frame() {
-                uniforms.u_time.value = clock.getElapsedTime();
-                uniforms.u_mouse.value.lerp(targetMouse, 0.04);
-                uniforms.u_scroll.value += (scrollP - uniforms.u_scroll.value) * 0.05;
-                renderer.render(scene, camera);
-                if (!reduceMotion) requestAnimationFrame(frame);
+            if (isMobile) {
+                window.addEventListener('deviceorientation', function (e) {
+                    if (e.gamma == null || e.beta == null) return;
+                    targetRot.y = Math.max(-0.6, Math.min(0.6, e.gamma / 45));
+                    targetRot.x = Math.max(-0.6, Math.min(0.6, (e.beta - 50) / 45));
+                }, { passive: true });
             }
-            frame();
+
+            // ===== RENDER: viaje guiado por el scroll (dos pasadas) =====
+            const clock = new THREE.Clock();
+            const camPos = new THREE.Vector3(), lookPos = new THREE.Vector3();
+            const camLead = 0.035;
+            let time = 0, sP = 0;
+            function draw() {
+                const dt = Math.min(clock.getDelta(), 0.05);
+                if (!reduceMotion) time += dt;
+                sP += (scrollP - sP) * (reduceMotion ? 1 : 0.08);
+
+                uniforms.u_time.value = time;
+                uniforms.u_mouse.value.lerp(targetMouse, 0.04);
+                uniforms.u_scroll.value += (sP - uniforms.u_scroll.value) * (reduceMotion ? 1 : 0.06);
+
+                // Cámara: vuela por la ruta mirando hacia adelante + parallax del mouse
+                curRot.x += (targetRot.x - curRot.x) * 0.06;
+                curRot.y += (targetRot.y - curRot.y) * 0.06;
+                const offX = curRot.y * 120, offY = -curRot.x * 120;
+                pathAt(sP - camLead, camPos);
+                pathAt(sP - camLead + 0.05, lookPos);
+                camera.position.set(camPos.x + offX, camPos.y + offY, camPos.z);
+                camera.lookAt(lookPos.x + offX * 0.5, lookPos.y + offY * 0.5, lookPos.z);
+
+                // Estrellas: deriva warp + envoltura infinita alrededor de la cámara
+                const arr = starGeo.attributes.position.array;
+                const cx = camera.position.x, cy = camera.position.y, cz = camera.position.z;
+                for (let i = 0; i < STAR_COUNT; i++) {
+                    if (!reduceMotion) arr[i * 3 + 2] += sSpd[i];
+                    const dz = arr[i * 3 + 2] - cz;
+                    if (dz > SPAN * 0.5) arr[i * 3 + 2] -= SPAN; else if (dz < -SPAN * 0.5) arr[i * 3 + 2] += SPAN;
+                    const dx = arr[i * 3] - cx;
+                    if (dx > FIELD * 0.5) arr[i * 3] -= FIELD; else if (dx < -FIELD * 0.5) arr[i * 3] += FIELD;
+                    const dy = arr[i * 3 + 1] - cy;
+                    if (dy > FIELD * 0.5) arr[i * 3 + 1] -= FIELD; else if (dy < -FIELD * 0.5) arr[i * 3 + 1] += FIELD;
+                }
+                starGeo.attributes.position.needsUpdate = true;
+
+                // Estaciones: rotación viva + realce (focus) según la sección activa
+                for (let i = 0; i < landmarks.length; i++) {
+                    const g = landmarks[i];
+                    const f = 1 - smoothstep(0.0, 0.22, Math.abs(sP - g.userData.t));
+                    g.userData.update(time, f);
+                    g.scale.setScalar(0.7 + 0.4 * f);
+                    g.traverse(function (o) {
+                        if (o.material && o.material.userData && o.material.userData.baseOpacity != null) {
+                            o.material.opacity = o.material.userData.baseOpacity * (0.22 + 0.78 * f);
+                        }
+                    });
+                }
+
+                renderer.clear();
+                // En tema claro NO se dibuja la nebulosa: queda el fondo blanco plano del clear.
+                if (isDark) {
+                    renderer.render(bgScene, bgCam);
+                    renderer.clearDepth();
+                }
+                renderer.render(scene, camera);
+            }
+
+            let scheduled = false;
+            function schedule() { if (scheduled) return; scheduled = true; requestAnimationFrame(function () { scheduled = false; draw(); }); }
+            if (!reduceMotion) {
+                (function loop() { draw(); requestAnimationFrame(loop); })();
+            } else {
+                draw();
+                window.addEventListener('scroll', schedule, { passive: true });
+                window.addEventListener('pointermove', schedule, { passive: true });
+            }
 
             window.addEventListener('resize', function () {
                 setDPR();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 uniforms.u_res.value.set(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                computeStations();
+                if (reduceMotion) draw();
             });
+        })();
+
+        // --- POLVO 3D FRONTAL: partículas suaves POR DELANTE del contenido ---
+        // Hace que el contenido quede "dentro" del 3D. Canvas 2D ligero con sprites.
+        (function initForegroundDust() {
+            const canvas = document.getElementById('fg-dust');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isMobile = window.innerWidth < 768;
+            let W = 0, H = 0, DPR = 1;
+            function resize() {
+                DPR = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth; H = window.innerHeight;
+                canvas.width = Math.floor(W * DPR);
+                canvas.height = Math.floor(H * DPR);
+                canvas.style.width = W + 'px';
+                canvas.style.height = H + 'px';
+                ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+            }
+            resize();
+
+            // Sprite suave pre-renderizado (uno por tema) para dibujar barato con drawImage
+            function makeSprite(rgb) {
+                const c = document.createElement('canvas'); c.width = c.height = 32;
+                const x = c.getContext('2d');
+                const g = x.createRadialGradient(16, 16, 0, 16, 16, 16);
+                g.addColorStop(0, 'rgba(' + rgb + ',1)');
+                g.addColorStop(1, 'rgba(' + rgb + ',0)');
+                x.fillStyle = g; x.fillRect(0, 0, 32, 32);
+                return c;
+            }
+            const spriteLight = makeSprite('39,70,144');   // azul oscuro sobre blanco
+            const spriteDark = makeSprite('173,216,255');  // cian claro sobre oscuro
+
+            const N = isMobile ? 60 : 120;
+            const dust = [];
+            for (let i = 0; i < N; i++) {
+                const z = 0.3 + Math.random() * 0.7; // profundidad: mayor = más cerca/grande/rápido
+                dust.push({
+                    x: Math.random() * W, y: Math.random() * H, z: z,
+                    r: (0.6 + Math.random() * 1.8) * z,
+                    vx: (Math.random() - 0.5) * 0.15 * z,
+                    vy: (-0.05 - Math.random() * 0.12) * z,
+                    a: 0.10 + Math.random() * 0.22
+                });
+            }
+
+            let mx = 0, my = 0, tmx = 0, tmy = 0;
+            window.addEventListener('pointermove', function (e) {
+                tmx = e.clientX / window.innerWidth - 0.5;
+                tmy = e.clientY / window.innerHeight - 0.5;
+            }, { passive: true });
+
+            function frame() {
+                mx += (tmx - mx) * 0.05;
+                my += (tmy - my) * 0.05;
+                ctx.clearRect(0, 0, W, H);
+                const dark = (document.documentElement.dataset.theme || 'light') === 'dark';
+                const sprite = dark ? spriteDark : spriteLight;
+                for (let i = 0; i < N; i++) {
+                    const p = dust[i];
+                    if (!reduceMotion) { p.x += p.vx; p.y += p.vy; }
+                    if (p.y < -12) { p.y = H + 12; p.x = Math.random() * W; }
+                    if (p.x < -12) p.x = W + 12; else if (p.x > W + 12) p.x = -12;
+                    const px = p.x + mx * 60 * p.z;
+                    const py = p.y + my * 40 * p.z;
+                    const s = p.r * 6;
+                    ctx.globalAlpha = p.a;
+                    ctx.drawImage(sprite, px - s / 2, py - s / 2, s, s);
+                }
+                ctx.globalAlpha = 1;
+                if (!reduceMotion) requestAnimationFrame(frame);
+            }
+            frame();
+            window.addEventListener('resize', resize, { passive: true });
         })();
     </script>
 
@@ -683,7 +1086,7 @@
                 if (themeToggle) themeToggle.innerHTML = (theme === 'dark') ? ICON_SUN : ICON_MOON;
                 if (window.__setNeuralTheme) window.__setNeuralTheme(theme === 'dark');
             };
-            applyTheme(document.documentElement.dataset.theme || 'dark');
+            applyTheme(document.documentElement.dataset.theme || 'light');
             if (themeToggle) {
                 themeToggle.addEventListener('click', () => {
                     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
@@ -734,11 +1137,20 @@
                 [langEsBtn, langEnBtn].forEach(b => b.addEventListener('click', () => showRole(roleIdx)));
             }
 
-            // --- HERO: FOCO INTERACTIVO + PARALLAX SUTIL ---
+            // --- HERO: FOCO INTERACTIVO + PARALLAX (mouse + scroll) ---
             const heroSection = document.getElementById('home');
             const heroSpotlight = document.getElementById('hero-spotlight');
             const heroParallax = document.getElementById('hero-parallax');
+            let hpMX = 0, hpMY = 0;
+            // El texto del hero se ALEJA hacia dentro del espacio 3D (translateZ) al hacer scroll
+            function applyHeroParallax() {
+                if (!heroParallax) return;
+                const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.9));
+                heroParallax.style.transform = 'perspective(1100px) translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 30).toFixed(1) + 'px,' + (-hp * 600).toFixed(0) + 'px) rotateX(' + (hp * 6).toFixed(1) + 'deg)';
+                heroParallax.style.opacity = (1 - hp * 0.9).toFixed(3);
+            }
             if (heroSection && !heroReduceMotion) {
+                if (heroParallax) heroParallax.style.willChange = 'transform, opacity';
                 heroSection.addEventListener('pointermove', (e) => {
                     const r = heroSection.getBoundingClientRect();
                     const x = (e.clientX - r.left) / r.width;
@@ -747,13 +1159,82 @@
                         heroSpotlight.style.setProperty('--mx', (x * 100) + '%');
                         heroSpotlight.style.setProperty('--my', (y * 100) + '%');
                     }
-                    if (heroParallax) {
-                        heroParallax.style.transform = 'translate(' + ((x - 0.5) * -14) + 'px,' + ((y - 0.5) * -10) + 'px)';
-                    }
+                    hpMX = (x - 0.5) * -14;
+                    hpMY = (y - 0.5) * -10;
+                    applyHeroParallax();
                 });
-                heroSection.addEventListener('pointerleave', () => {
-                    if (heroParallax) heroParallax.style.transform = 'translate(0,0)';
+                heroSection.addEventListener('pointerleave', () => { hpMX = 0; hpMY = 0; applyHeroParallax(); });
+            }
+
+            // --- CADA SECCIÓN ES UN PANEL 3D CON PROFUNDIDAD ---
+            // La sección entera (texto + tarjetas) viaja por el espacio: lejos e inclinada al
+            // entrar/salir, y al frente y nítida cuando la estás leyendo (centrada). Así cada
+            // sección es parte de la experiencia 3D inmersiva.
+            const parallaxLayers = [];
+            function docTop(el) { let y = 0, n = el; while (n) { y += n.offsetTop; n = n.offsetParent; } return y; }
+            function addSectionDepth(selector, cfg) {
+                cfg = cfg || {};
+                document.querySelectorAll(selector).forEach((el) => {
+                    el.style.willChange = 'transform';
+                    el.style.transformOrigin = '50% 50%';
+                    parallaxLayers.push({ el: el, z: cfg.z || 680, tilt: cfg.tilt || 16, persp: cfg.persp || 1200 });
                 });
+            }
+            if (!heroReduceMotion) {
+                addSectionDepth('#about, #skills, #projects, #contact');
+            }
+            function applyParallaxLayers() {
+                const vh = window.innerHeight;
+                for (let i = 0; i < parallaxLayers.length; i++) {
+                    const L = parallaxLayers[i];
+                    // 'rel' a partir de la posición de LAYOUT (no del rect transformado) -> sin realimentación
+                    const center = docTop(L.el) + L.el.offsetHeight / 2 - window.scrollY;
+                    let rel = (center - vh / 2) / vh;
+                    rel = Math.max(-0.9, Math.min(0.9, rel));
+                    const z = (-Math.abs(rel) * L.z).toFixed(0); // se aleja (recede) cuando no está centrada
+                    const rx = (rel * L.tilt).toFixed(2);         // se inclina al entrar/salir
+                    L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + z + 'px) rotateX(' + rx + 'deg)';
+                }
+            }
+
+            // rAF unificado para todo el parallax ligado al scroll (hero + capas de texto)
+            let parallaxTicking = false;
+            function onParallaxScroll() {
+                if (parallaxTicking) return;
+                parallaxTicking = true;
+                requestAnimationFrame(() => {
+                    applyHeroParallax();
+                    applyParallaxLayers();
+                    parallaxTicking = false;
+                });
+            }
+            if (!heroReduceMotion) {
+                window.addEventListener('scroll', onParallaxScroll, { passive: true });
+                window.addEventListener('resize', onParallaxScroll, { passive: true });
+                applyHeroParallax();
+                applyParallaxLayers();
+            }
+
+            // --- TARJETAS 3D: tilt + brillo que sigue al cursor (secciones inmersivas) ---
+            const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            if (canHover && !heroReduceMotion) {
+                const addTilt = (el, maxDeg, lift) => {
+                    el.addEventListener('pointermove', (e) => {
+                        const r = el.getBoundingClientRect();
+                        const x = (e.clientX - r.left) / r.width - 0.5;
+                        const y = (e.clientY - r.top) / r.height - 0.5;
+                        el.style.setProperty('--mx', ((x + 0.5) * 100).toFixed(1) + '%');
+                        el.style.setProperty('--my', ((y + 0.5) * 100).toFixed(1) + '%');
+                        el.style.transition = 'transform 0.12s ease-out';
+                        el.style.transform = 'perspective(900px) rotateY(' + (x * maxDeg).toFixed(2) + 'deg) rotateX(' + (-y * maxDeg).toFixed(2) + 'deg) translateY(' + lift + 'px)';
+                    });
+                    el.addEventListener('pointerleave', () => {
+                        el.style.transition = 'transform 0.5s ease';
+                        el.style.transform = '';
+                    });
+                };
+                document.querySelectorAll('#skills .skill-card').forEach((c) => addTilt(c, 8, -8));
+                document.querySelectorAll('#projects .project-trigger').forEach((c) => addTilt(c, 6, -6));
             }
 
             // --- HERO: VENTANA DE CÓDIGO QUE SE ESCRIBE SOLA ---
@@ -817,8 +1298,15 @@
             const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        revealObserver.unobserve(entry.target); // anima una vez, no re-oculta
+                        const t = entry.target;
+                        t.classList.add('visible');
+                        revealObserver.unobserve(t); // anima una vez, no re-oculta
+                        // Tras enfocar, elimina el filtro para no romper el "glass" (backdrop-filter)
+                        // de las tarjetas anidadas, que falla si un ancestro mantiene un filter.
+                        setTimeout(() => {
+                            t.style.filter = 'none';
+                            for (let i = 0; i < t.children.length; i++) t.children[i].style.filter = 'none';
+                        }, 1100);
                     }
                 });
             }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
