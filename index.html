@@ -18,7 +18,7 @@
             --bg: #FFFFFF;
             --text: #0F172A;
             --muted: #64748B;
-            --accent: #2563EB;
+            --accent: #BC002D;
             --font-display: 'Space Grotesk', 'Inter', sans-serif;
             --card: #FFFFFF;
             --border: #E6EAF2;
@@ -27,7 +27,7 @@
             --btn-sec-border: rgba(15, 23, 42, 0.16);
             --code-text: #334155;
             --code-shadow: rgba(255, 255, 255, 0.85);
-            --spotlight: rgba(37, 99, 235, 0.10);
+            --spotlight: rgba(188, 0, 45, 0.12);
             --tok-kw: #9333ea; --tok-var: #2563eb; --tok-prop: #0e7490;
             --tok-str: #15803d; --tok-punc: #0891b2; --tok-fn: #b45309; --tok-num: #c2410c;
             --card-shadow: 0 22px 48px -30px rgba(2, 6, 23, 0.40);
@@ -40,7 +40,7 @@
             --bg: #05070D;
             --text: #E7EBF3;
             --muted: #8A93A6;
-            --accent: #5B8CFF;
+            --accent: #FF4D5E;
             --card: #0B0F18;
             --border: #1A2030;
             --header-bg: rgba(5, 7, 13, 0.70);
@@ -48,7 +48,7 @@
             --btn-sec-border: rgba(255, 255, 255, 0.18);
             --code-text: #C9D4E8;
             --code-shadow: rgba(0, 0, 0, 0);
-            --spotlight: rgba(91, 140, 255, 0.16);
+            --spotlight: rgba(255, 77, 94, 0.18);
             --tok-kw: #c792ea; --tok-var: #82aaff; --tok-prop: #7fdbca;
             --tok-str: #c3e88d; --tok-punc: #89ddff; --tok-fn: #ffcb6b; --tok-num: #f78c6c;
             --card-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
@@ -147,9 +147,9 @@
         }
         .btn:hover { transform: translateY(-2px); }
         .btn-primary { background-color: var(--accent); color: #FFFFFF; }
-        .btn-primary:hover { background-color: #1D4ED8; }
+        .btn-primary:hover { background-color: #9E0026; }
         .btn-secondary { border: 1px solid var(--btn-sec-border); color: var(--text); }
-        .btn-secondary:hover { border-color: var(--accent); background-color: rgba(91,140,255,0.08); }
+        .btn-secondary:hover { border-color: var(--accent); background-color: rgba(188, 0, 45, 0.08); }
 
         /* Glow sutil y profundo para el hero */
         #hero-background {
@@ -160,8 +160,8 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
-            background: radial-gradient(ellipse at 75% 25%, rgba(91, 140, 255, 0.10), transparent 55%),
-                        radial-gradient(ellipse at 15% 85%, rgba(34, 167, 255, 0.06), transparent 55%);
+            background: radial-gradient(ellipse at 75% 25%, rgba(188, 0, 45, 0.10), transparent 55%),
+                        radial-gradient(ellipse at 15% 85%, rgba(255, 82, 82, 0.06), transparent 55%);
             animation: subtle-aurora 28s infinite alternate;
         }
         @keyframes subtle-aurora {
@@ -200,7 +200,7 @@
 
         /* Cada palabra usa un tratamiento tipográfico distinto */
         .style-gradient {
-            background: linear-gradient(92deg, var(--accent), #22d3ee 78%);
+            background: linear-gradient(92deg, var(--accent), #FF5252 78%);
             -webkit-background-clip: text; background-clip: text; color: transparent;
         }
         .style-solid   { color: var(--text); }
@@ -209,7 +209,7 @@
             -webkit-text-stroke: 2px var(--accent);
         }
         .style-italic  { font-style: italic; font-weight: 600; color: var(--muted); }
-        .style-glow    { color: var(--accent); text-shadow: 0 0 26px rgba(91, 140, 255, 0.45); }
+        .style-glow    { color: var(--accent); text-shadow: 0 0 26px rgba(188, 0, 45, 0.45); }
 
         @media (prefers-reduced-motion: reduce) {
             #hero-rotator, #hero-parallax { transition: none !important; transform: none !important; }
@@ -288,7 +288,7 @@
             top: 0; left: 0;
             height: 2px;
             width: 0;
-            background: linear-gradient(90deg, #5B8CFF, #22d3ee);
+            background: linear-gradient(90deg, #BC002D, #FF5252);
             z-index: 60;
             pointer-events: none;
         }
@@ -477,7 +477,7 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl reveal-stagger">
                     <!-- Skill Card: HTML & CSS -->
-                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-orange-500/40 hover:-translate-y-2" style="--hover-color: #f97316;">
+                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-red-500/40 hover:-translate-y-2" style="--hover-color: #e63946;">
                         <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
                              <span class="skill-icon-text text-2xl font-extrabold text-soft">&lt;/&gt;</span>
                         </div>
@@ -485,7 +485,7 @@
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ae_desc">Maquetación semántica, responsive y accesible. Layouts modernos con Flexbox, Grid y Tailwind.</p>
                     </div>
                     <!-- Skill Card: JavaScript -->
-                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-yellow-500/40 hover:-translate-y-2" style="--hover-color: #eab308;">
+                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-rose-500/40 hover:-translate-y-2" style="--hover-color: #ff5252;">
                         <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
                              <span class="skill-icon-text text-3xl font-extrabold text-soft">JS</span>
                         </div>
@@ -493,7 +493,7 @@
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_pr_desc">Interactividad y lógica del lado del cliente con JavaScript moderno (ES6+) y APIs del navegador.</p>
                     </div>
                     <!-- Skill Card: React -->
-                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-cyan-500/40 hover:-translate-y-2" style="--hover-color: #06b6d4;">
+                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-red-600/40 hover:-translate-y-2" style="--hover-color: #c8102e;">
                         <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
                              <span class="skill-icon-text text-3xl font-extrabold text-soft">⚛</span>
                         </div>
@@ -501,7 +501,7 @@
                         <p class="text-muted text-sm leading-relaxed" data-lang="skills_ps_desc">Aplicaciones web dinámicas con React y componentes reutilizables, escalables y mantenibles.</p>
                     </div>
                     <!-- Skill Card: Animación Web / UI-UX -->
-                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-blue-500/40 hover:-translate-y-2" style="--hover-color: #3b82f6;">
+                    <div class="skill-card bg-card border border-card rounded-2xl p-8 transition-all duration-300 hover:border-orange-500/40 hover:-translate-y-2" style="--hover-color: #ff7043;">
                         <div class="skill-icon-bg flex justify-center items-center mb-6 w-16 h-16 rounded-xl">
                              <span class="skill-icon-text text-3xl font-extrabold text-soft">UI</span>
                         </div>
@@ -522,10 +522,10 @@
                 </div>
                 <div class="swiper-container max-w-6xl">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Reel" alt="Web Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de desarrollo web e interacción.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="wLsHXR-egpg"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Portfolio" alt="Portfolio Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_portfolio_title">Portafolio</h3><p class="text-muted text-sm" data-lang="projects_portfolio_desc">Una selección destacada de mis proyectos y capacidades.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+App" alt="Web App Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_motion_title">Aplicaciones Web</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Interfaces dinámicas e interactivas para web y redes sociales.</p></div></div></div>
-                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-blue-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Animation" alt="Web Animation Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_vfx_title">Animación Web</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de experiencias animadas e interactivas en el navegador.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-red-500/40 transition-colors duration-300" data-video-id="W2tDm558i68"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Reel" alt="Web Reel Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_reel_title">Reel de Proyectos</h3><p class="text-muted text-sm" data-lang="projects_reel_desc">Una muestra de diversos trabajos de desarrollo web e interacción.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-red-500/40 transition-colors duration-300" data-video-id="wLsHXR-egpg"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Portfolio" alt="Portfolio Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_portfolio_title">Portafolio</h3><p class="text-muted text-sm" data-lang="projects_portfolio_desc">Una selección destacada de mis proyectos y capacidades.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-red-500/40 transition-colors duration-300" data-video-id="qixyf0rh_YQ"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+App" alt="Web App Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_motion_title">Aplicaciones Web</h3><p class="text-muted text-sm" data-lang="projects_motion_desc">Interfaces dinámicas e interactivas para web y redes sociales.</p></div></div></div>
+                        <div class="swiper-slide"><div class="project-trigger bg-card border border-card rounded-2xl overflow-hidden group w-full cursor-pointer hover:border-red-500/40 transition-colors duration-300" data-video-id="u9s7afoYI-I"><img src="https://placehold.co/600x400/E2E8F0/64748B?text=Web+Animation" alt="Web Animation Thumbnail" class="w-full h-auto object-cover group-hover:opacity-90 transition-opacity duration-300"><div class="p-6"><h3 class="text-xl font-bold mb-2 text-strong" data-lang="projects_vfx_title">Animación Web</h3><p class="text-muted text-sm" data-lang="projects_vfx_desc">Una colección de experiencias animadas e interactivas en el navegador.</p></div></div></div>
                     </div>
                     <div class="swiper-pagination mt-8"></div>
                     <div class="swiper-button-next"></div>
@@ -632,9 +632,9 @@
                 '  vec2 q = vec2(fbm(p*2.2 + vec2(0.0, t)), fbm(p*2.2 + vec2(5.2,1.3) - t));',
                 '  vec2 r = vec2(fbm(p*2.2 + 2.8*q + vec2(1.7,9.2) + m*0.7 + 0.5*t), fbm(p*2.2 + 2.8*q + vec2(8.3,2.8) - m*0.7));',
                 '  float f = fbm(p*2.2 + 2.4*r);',
-                '  vec3 cBlue = vec3(0.12,0.34,0.98);',
-                '  vec3 cCyan = vec3(0.10,0.78,0.98);',
-                '  vec3 cViol = vec3(0.45,0.22,0.97);',
+                '  vec3 cBlue = vec3(0.85,0.05,0.18);',
+                '  vec3 cCyan = vec3(0.98,0.42,0.35);',
+                '  vec3 cViol = vec3(0.78,0.10,0.30);',
                 '  vec3 col = mix(cBlue, cCyan, smoothstep(0.1,0.9,f));',
                 '  col = mix(col, cViol, smoothstep(0.35,1.0, length(r)));',
                 '  float glow = pow(clamp(f,0.0,1.0), 1.4);',
@@ -699,7 +699,7 @@
             const sPos = new Float32Array(STAR_COUNT * 3);
             const sCol = new Float32Array(STAR_COUNT * 3);
             const sSpd = new Float32Array(STAR_COUNT);
-            const palette = [new THREE.Color(0x5b8cff), new THREE.Color(0x22d3ee), new THREE.Color(0x8b5cf6), new THREE.Color(0xffffff)];
+            const palette = [new THREE.Color(0xff4d5e), new THREE.Color(0xff6b6b), new THREE.Color(0xff8a80), new THREE.Color(0xffffff)];
             for (let i = 0; i < STAR_COUNT; i++) {
                 sPos[i * 3]     = (Math.random() - 0.5) * FIELD;
                 sPos[i * 3 + 1] = (Math.random() - 0.5) * FIELD;
@@ -730,16 +730,16 @@
             (function () {
                 const g = new THREE.Group();
                 const geo = new THREE.IcosahedronGeometry(150, 1);
-                g.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(0x5b8cff, 0x2563eb, 0.55, 0.30)));
-                g.add(new THREE.Points(geo, glowMat(0x22d3ee, 0x2563eb, 18, 0.90, 0.50)));
+                g.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(0xff4d5e, 0xbc002d, 0.55, 0.30)));
+                g.add(new THREE.Points(geo, glowMat(0xff6b6b, 0xbc002d, 18, 0.90, 0.50)));
                 reg(g, 0.06, (time) => { g.rotation.y = time * 0.15; g.rotation.x = time * 0.07; });
             })();
 
             // Estación 1 — Portal (Sobre mí): dos anillos que la cámara atraviesa
             (function () {
                 const g = new THREE.Group();
-                const r1 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(270, 7, 8, 64)), lineMat(0x22d3ee, 0x0891b2, 0.50, 0.30));
-                const r2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(185, 5, 6, 50)), lineMat(0x8b5cf6, 0x7c3aed, 0.46, 0.28));
+                const r1 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(270, 7, 8, 64)), lineMat(0xff6b6b, 0xc8102e, 0.50, 0.30));
+                const r2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(185, 5, 6, 50)), lineMat(0xff8a80, 0xbc002d, 0.46, 0.28));
                 g.add(r1, r2);
                 reg(g, 0.28, (time) => { r1.rotation.z = time * 0.20; r2.rotation.z = -time * 0.30; r2.rotation.x = time * 0.15; });
             })();
@@ -748,8 +748,8 @@
             (function () {
                 const g = new THREE.Group();
                 const geo = new THREE.OctahedronGeometry(46, 0);
-                const hd = [0xf97316, 0xeab308, 0x06b6d4, 0x3b82f6];
-                const hl = [0xea580c, 0xca8a04, 0x0891b2, 0x2563eb];
+                const hd = [0xff5252, 0xff7043, 0xe63946, 0xff8a80];
+                const hl = [0xc8102e, 0xd7263d, 0xbc002d, 0xe63946];
                 const nodes = [];
                 for (let k = 0; k < 4; k++) {
                     const ang = k / 4 * Math.PI * 2;
@@ -768,7 +768,7 @@
                 const edges = new THREE.EdgesGeometry(new THREE.PlaneGeometry(220, 130));
                 for (let k = 0; k < 5; k++) {
                     const ang = k / 5 * Math.PI * 2;
-                    const panel = new THREE.LineSegments(edges, lineMat(0x5b8cff, 0x2563eb, 0.50, 0.30));
+                    const panel = new THREE.LineSegments(edges, lineMat(0xff4d5e, 0xbc002d, 0.50, 0.30));
                     panel.position.set(Math.cos(ang) * 300, Math.sin(ang) * 185, (k - 2) * 45);
                     panel.rotation.z = ang;
                     g.add(panel);
@@ -779,8 +779,8 @@
             // Estación 4 — Faro de contacto (Contacto): esfera de puntos + anillo
             (function () {
                 const g = new THREE.Group();
-                const ball = new THREE.Points(new THREE.IcosahedronGeometry(58, 3), glowMat(0x22d3ee, 0x2563eb, 10, 0.95, 0.60));
-                const ring = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(140, 4, 6, 50)), lineMat(0x5b8cff, 0x2563eb, 0.60, 0.34));
+                const ball = new THREE.Points(new THREE.IcosahedronGeometry(58, 3), glowMat(0xff6b6b, 0xbc002d, 10, 0.95, 0.60));
+                const ring = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(140, 4, 6, 50)), lineMat(0xff4d5e, 0xbc002d, 0.60, 0.34));
                 g.add(ball, ring);
                 reg(g, 0.93, (time) => { ball.rotation.y = time * 0.30; ring.rotation.x = time * 0.40; ring.rotation.z = time * 0.20; ball.scale.setScalar(1 + Math.sin(time * 2) * 0.06); });
             })();
@@ -809,7 +809,7 @@
                 renderer.setClearColor(dark ? 0x05070d : 0xf7f9fb, 1);
                 scene.fog.color.set(dark ? 0x05070d : 0xf7f9fb); // niebla = color del fondo -> profundidad sobre blanco
                 starMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
-                starMat.color.set(dark ? 0xffffff : 0x274690);
+                starMat.color.set(dark ? 0xffffff : 0xc8102e);
                 starMat.opacity = dark ? 0.95 : 0.55;
                 starMat.needsUpdate = true;
                 themeMats.forEach((m) => {
@@ -960,8 +960,8 @@
                 x.fillStyle = g; x.fillRect(0, 0, 32, 32);
                 return c;
             }
-            const spriteLight = makeSprite('39,70,144');   // azul oscuro sobre blanco
-            const spriteDark = makeSprite('173,216,255');  // cian claro sobre oscuro
+            const spriteLight = makeSprite('188,0,45');    // rojo (Hinomaru) sobre blanco
+            const spriteDark = makeSprite('255,138,138');  // rojo claro sobre oscuro
 
             const N = isMobile ? 60 : 120;
             const dust = [];
