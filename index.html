@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alex Andrade - Desarrollador Multimedia Web</title>
     <!-- Tema (oscuro/claro) aplicado antes de pintar para evitar parpadeo -->
-    <script>(function () { try { document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark'; } catch (e) { document.documentElement.dataset.theme = 'dark'; } })();</script>
+    <script>(function () { try { if (localStorage.getItem('themeReset2') !== '1') { localStorage.setItem('theme', 'light'); localStorage.setItem('themeReset2', '1'); } document.documentElement.dataset.theme = localStorage.getItem('theme') || 'light'; } catch (e) { document.documentElement.dataset.theme = 'light'; } })();</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@
             --tok-kw: #9333ea; --tok-var: #2563eb; --tok-prop: #0e7490;
             --tok-str: #15803d; --tok-punc: #0891b2; --tok-fn: #b45309; --tok-num: #c2410c;
             --card-shadow: 0 22px 48px -30px rgba(2, 6, 23, 0.40);
-            --glass-bg: rgba(255, 255, 255, 0.62);
+            --glass-bg: rgba(255, 255, 255, 0.55);
             --glass-border: rgba(15, 23, 42, 0.12);
             --glass-blur: 14px;
         }
@@ -102,6 +102,18 @@
             width: 100%;
             height: 100%;
             z-index: -1;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* Capa de "polvo" 3D POR DELANTE del contenido: el contenido queda dentro del 3D */
+        #fg-dust {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 40; /* por encima de las secciones, por debajo del header (z-50) */
             pointer-events: none;
             display: block;
         }
@@ -388,6 +400,8 @@
 
     <!-- Canvas de animación 3D de fondo (Three.js) -->
     <canvas id="bg-canvas-3d"></canvas>
+    <!-- Capa de polvo 3D POR DELANTE del contenido (2D ligero) -->
+    <canvas id="fg-dust"></canvas>
 
     <!-- Header / Barra de Navegación -->
     <header id="header" class="sticky top-0 z-50 backdrop-blur-xl border-b border-card">
@@ -593,7 +607,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.autoClear = false;
 
-            let isDark = (document.documentElement.dataset.theme || 'dark') === 'dark';
+            let isDark = (document.documentElement.dataset.theme || 'light') === 'dark';
 
             // ===== PASADA 1: telón de aurora (shader a pantalla completa) =====
             const bgScene = new THREE.Scene();
@@ -802,16 +816,18 @@
             function applyTheme(dark) {
                 isDark = dark;
                 uniforms.u_dark.value = dark ? 1.0 : 0.0;
-                renderer.setClearColor(dark ? 0x05070d : 0xf7f9fc, 1);
-                scene.fog.color.set(dark ? 0x05070d : 0xeaf0f8);
+                // Tema claro = FONDO BLANCO PLANO (sin nebulosa); tema oscuro = nebulosa espacial
+                renderer.setClearColor(dark ? 0x05070d : 0xf7f9fb, 1);
+                scene.fog.color.set(dark ? 0x05070d : 0xf7f9fb); // niebla = color del fondo -> profundidad sobre blanco
                 starMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
-                starMat.color.set(dark ? 0xffffff : 0x3b5bb5);
-                starMat.opacity = dark ? 0.95 : 0.6;
+                starMat.color.set(dark ? 0xffffff : 0x274690);
+                starMat.opacity = dark ? 0.95 : 0.55;
                 starMat.needsUpdate = true;
                 themeMats.forEach((m) => {
                     m.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
                     m.color.set(dark ? m.userData.d : m.userData.l);
-                    m.userData.baseOpacity = dark ? m.userData.od : m.userData.ol;
+                    // En blanco, las líneas/figuras necesitan más opacidad para leerse bien
+                    m.userData.baseOpacity = dark ? m.userData.od : Math.min(0.92, m.userData.ol * 1.9);
                     m.opacity = m.userData.baseOpacity;
                     m.needsUpdate = true;
                 });
@@ -895,8 +911,11 @@
                 }
 
                 renderer.clear();
-                renderer.render(bgScene, bgCam);
-                renderer.clearDepth();
+                // En tema claro NO se dibuja la nebulosa: queda el fondo blanco plano del clear.
+                if (isDark) {
+                    renderer.render(bgScene, bgCam);
+                    renderer.clearDepth();
+                }
                 renderer.render(scene, camera);
             }
 
@@ -919,6 +938,83 @@
                 computeStations();
                 if (reduceMotion) draw();
             });
+        })();
+
+        // --- POLVO 3D FRONTAL: partículas suaves POR DELANTE del contenido ---
+        // Hace que el contenido quede "dentro" del 3D. Canvas 2D ligero con sprites.
+        (function initForegroundDust() {
+            const canvas = document.getElementById('fg-dust');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isMobile = window.innerWidth < 768;
+            let W = 0, H = 0, DPR = 1;
+            function resize() {
+                DPR = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth; H = window.innerHeight;
+                canvas.width = Math.floor(W * DPR);
+                canvas.height = Math.floor(H * DPR);
+                canvas.style.width = W + 'px';
+                canvas.style.height = H + 'px';
+                ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+            }
+            resize();
+
+            // Sprite suave pre-renderizado (uno por tema) para dibujar barato con drawImage
+            function makeSprite(rgb) {
+                const c = document.createElement('canvas'); c.width = c.height = 32;
+                const x = c.getContext('2d');
+                const g = x.createRadialGradient(16, 16, 0, 16, 16, 16);
+                g.addColorStop(0, 'rgba(' + rgb + ',1)');
+                g.addColorStop(1, 'rgba(' + rgb + ',0)');
+                x.fillStyle = g; x.fillRect(0, 0, 32, 32);
+                return c;
+            }
+            const spriteLight = makeSprite('39,70,144');   // azul oscuro sobre blanco
+            const spriteDark = makeSprite('173,216,255');  // cian claro sobre oscuro
+
+            const N = isMobile ? 60 : 120;
+            const dust = [];
+            for (let i = 0; i < N; i++) {
+                const z = 0.3 + Math.random() * 0.7; // profundidad: mayor = más cerca/grande/rápido
+                dust.push({
+                    x: Math.random() * W, y: Math.random() * H, z: z,
+                    r: (0.6 + Math.random() * 1.8) * z,
+                    vx: (Math.random() - 0.5) * 0.15 * z,
+                    vy: (-0.05 - Math.random() * 0.12) * z,
+                    a: 0.10 + Math.random() * 0.22
+                });
+            }
+
+            let mx = 0, my = 0, tmx = 0, tmy = 0;
+            window.addEventListener('pointermove', function (e) {
+                tmx = e.clientX / window.innerWidth - 0.5;
+                tmy = e.clientY / window.innerHeight - 0.5;
+            }, { passive: true });
+
+            function frame() {
+                mx += (tmx - mx) * 0.05;
+                my += (tmy - my) * 0.05;
+                ctx.clearRect(0, 0, W, H);
+                const dark = (document.documentElement.dataset.theme || 'light') === 'dark';
+                const sprite = dark ? spriteDark : spriteLight;
+                for (let i = 0; i < N; i++) {
+                    const p = dust[i];
+                    if (!reduceMotion) { p.x += p.vx; p.y += p.vy; }
+                    if (p.y < -12) { p.y = H + 12; p.x = Math.random() * W; }
+                    if (p.x < -12) p.x = W + 12; else if (p.x > W + 12) p.x = -12;
+                    const px = p.x + mx * 60 * p.z;
+                    const py = p.y + my * 40 * p.z;
+                    const s = p.r * 6;
+                    ctx.globalAlpha = p.a;
+                    ctx.drawImage(sprite, px - s / 2, py - s / 2, s, s);
+                }
+                ctx.globalAlpha = 1;
+                if (!reduceMotion) requestAnimationFrame(frame);
+            }
+            frame();
+            window.addEventListener('resize', resize, { passive: true });
         })();
     </script>
 
@@ -1001,7 +1097,7 @@
                 if (themeToggle) themeToggle.innerHTML = (theme === 'dark') ? ICON_SUN : ICON_MOON;
                 if (window.__setNeuralTheme) window.__setNeuralTheme(theme === 'dark');
             };
-            applyTheme(document.documentElement.dataset.theme || 'dark');
+            applyTheme(document.documentElement.dataset.theme || 'light');
             if (themeToggle) {
                 themeToggle.addEventListener('click', () => {
                     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
