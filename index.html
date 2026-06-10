@@ -375,6 +375,29 @@
             #about img { animation: none !important; }
         }
 
+        /* TÚNEL Z: TODO el portafolio es UNA sola línea en el eje Z. El escenario es fijo,
+           cada sección vive a una profundidad distinta (sección i a -i·SPACING) y el scroll
+           te ADENTRA en el túnel: la sección llega desde el fondo, se enfoca frente a ti
+           y al seguir scrolleando la ATRAVIESAS. El motor JS coloca todo cada frame. */
+        body.zmode main {
+            position: fixed; inset: 0; z-index: 1;
+            perspective: 1100px; perspective-origin: 50% 46%;
+            overflow: hidden;
+        }
+        body.zmode main > section {
+            position: absolute; left: 50%; top: 0;
+            width: min(1160px, 94vw);
+            margin: 0;
+            will-change: transform, opacity, filter;
+            backface-visibility: hidden;
+            visibility: hidden; /* el motor las muestra según su profundidad */
+        }
+        body.zmode main > section#home { min-height: 0; }
+        body.zmode footer {
+            position: fixed; left: 0; right: 0; bottom: 0.5rem; z-index: 2;
+            border: 0; padding: 0; background: transparent; pointer-events: none;
+        }
+
         /* LÍNEA DE TIEMPO 3D: viajas por DENTRO de la línea; cada hito llega desde la
            profundidad, gira alrededor de la línea central y su punto se enciende al
            quedar en foco. La línea se llena de rojo según avanzas. */
@@ -692,6 +715,9 @@
             </div>
         </section>
     </main>
+
+    <!-- Pista de scroll del túnel Z: da la altura de scroll mientras el escenario está fijo -->
+    <div id="z-track" aria-hidden="true"></div>
 
     <!-- Footer -->
     <footer class="border-t border-card py-8">
@@ -1273,21 +1299,10 @@
             // --- HERO: FOCO INTERACTIVO + PARALLAX (mouse + scroll) ---
             const heroSection = document.getElementById('home');
             const heroSpotlight = document.getElementById('hero-spotlight');
-            const heroParallax = document.getElementById('hero-parallax');
             let hpMX = 0, hpMY = 0;
-            // 'scrollWarp' = velocidad de navegación (0..1): alimenta el efecto warp de toda la página
+            // 'scrollWarp' = velocidad de navegación (0..1): alimenta el warp de todo el túnel
             let scrollWarp = 0;
-            // El texto del hero se LANZA hacia el fondo del espacio 3D al hacer scroll
-            function applyHeroParallax() {
-                if (!heroParallax) return;
-                const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.85));
-                heroParallax.style.transform = 'perspective(950px) translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 46).toFixed(1) + 'px,' + (-hp * 1500).toFixed(0) + 'px) rotateX(' + (hp * 16).toFixed(1) + 'deg)';
-                heroParallax.style.opacity = (1 - hp * 0.95).toFixed(3);
-                const hb = hp * hp * 9 + scrollWarp * 3;
-                heroParallax.style.filter = hb > 0.05 ? 'blur(' + hb.toFixed(2) + 'px)' : 'none'; // profundidad de campo + warp
-            }
             if (heroSection && !heroReduceMotion) {
-                if (heroParallax) heroParallax.style.willChange = 'transform, opacity';
                 heroSection.addEventListener('pointermove', (e) => {
                     const r = heroSection.getBoundingClientRect();
                     const x = (e.clientX - r.left) / r.width;
@@ -1298,117 +1313,177 @@
                     }
                     hpMX = (x - 0.5) * -14;
                     hpMY = (y - 0.5) * -10;
-                    applyHeroParallax();
+                    requestZRender();
                 });
-                heroSection.addEventListener('pointerleave', () => { hpMX = 0; hpMY = 0; applyHeroParallax(); });
+                heroSection.addEventListener('pointerleave', () => { hpMX = 0; hpMY = 0; requestZRender(); });
             }
 
-            // --- CADA SECCIÓN ES UN PANEL 3D CON PROFUNDIDAD ---
-            // La sección entera (texto + tarjetas) viaja por el espacio: lejos e inclinada al
-            // entrar/salir, y al frente y nítida cuando la estás leyendo (centrada). Así cada
-            // sección es parte de la experiencia 3D inmersiva.
-            const parallaxLayers = [];
-            function docTop(el) { let y = 0, n = el; while (n) { y += n.offsetTop; n = n.offsetParent; } return y; }
-            const dofMobile = window.matchMedia('(max-width: 640px)').matches;
-            function addSectionDepth(selector, cfg) {
-                cfg = cfg || {};
-                document.querySelectorAll(selector).forEach((el) => {
-                    el.style.willChange = 'transform, filter, opacity';
-                    el.style.transformOrigin = '50% 50%';
-                    parallaxLayers.push({
-                        el: el,
-                        z: cfg.z || (dofMobile ? 1300 : 2600),
-                        tilt: cfg.tilt != null ? cfg.tilt : (dofMobile ? 14 : 26),
-                        roll: cfg.roll != null ? cfg.roll : (dofMobile ? 4 : 9),
-                        persp: cfg.persp || 1000,
-                        blur: cfg.blur != null ? cfg.blur : (dofMobile ? 2 : 4)
-                    });
-                });
-            }
-            if (!heroReduceMotion) {
-                addSectionDepth('#about, #skills, #projects, #contact');
-                addSectionDepth('#timeline .tl-head');
-                // Los HITOS viajan POR DENTRO de la línea de tiempo: cada uno llega desde la
-                // profundidad girando alrededor de la línea y se enciende al quedar en foco.
-                addSectionDepth('#timeline .tl-item', dofMobile
-                    ? { z: 1000, tilt: 12, roll: 7, persp: 900, blur: 2 }
-                    : { z: 2000, tilt: 24, roll: 14, persp: 900, blur: 3.5 });
-            }
-            // NAVEGACIÓN 3D POTENTE: la sección enfocada está al FRENTE, nítida y a tamaño
-            // completo; al navegar sale disparada HACIA EL FONDO girando (rotateX/rotateY),
-            // encogiéndose y desenfocándose, mientras la siguiente llega desde la profundidad.
-            // 'scrollWarp' añade motion blur y más giro cuanto más rápido navegas.
-            function applyParallaxLayers() {
+            // ================= TÚNEL Z: EL PORTAFOLIO ENTERO SOBRE UNA LÍNEA EN EL EJE Z =================
+            // Todas las secciones viven sobre UNA línea de profundidad (sección i a -i·SPACING).
+            // El scroll empuja la cámara HACIA DENTRO: la sección llega desde el fondo del túnel,
+            // se enfoca frente a ti y, al seguir, la ATRAVIESAS y aparece la siguiente.
+            // Las secciones más altas que la ventana tienen una fase de "lectura" (dwell) en la que
+            // el scroll desplaza su contenido hacia arriba antes de continuar el viaje en Z.
+            const zMobile = window.matchMedia('(max-width: 640px)').matches;
+            const SPACING = zMobile ? 1600 : 2600;
+            const zSecs = ['home', 'about', 'skills', 'timeline', 'projects', 'contact']
+                .map((id) => document.getElementById(id)).filter(Boolean);
+            const zTrack = document.getElementById('z-track');
+            const zOn = !heroReduceMotion && zSecs.length > 0 && !!zTrack;
+            let zBudget = [], zTotal = 0;
+
+            function zMeasure() {
                 const vh = window.innerHeight;
-                const wK = 1 + scrollWarp * 0.9; // el warp exagera el giro
-                for (let i = 0; i < parallaxLayers.length; i++) {
-                    const L = parallaxLayers[i];
-                    // 'rel' desde la posición de LAYOUT (no del rect transformado) -> sin realimentación
-                    const center = docTop(L.el) + L.el.offsetHeight / 2 - window.scrollY;
-                    let rel = (center - vh / 2) / vh;
-                    rel = Math.max(-1, Math.min(1, rel));
-                    const d = Math.abs(rel);
-                    const focus = Math.max(0, (d - 0.18) / 0.82); // 0 = en foco (zona nítida central)
-                    const ease = focus * focus;                    // acelera al salir del foco
-                    const z = (-(0.35 * focus + 0.65 * ease) * L.z).toFixed(0);
-                    const rx = (rel * L.tilt * wK).toFixed(2);
-                    const ry = (-rel * L.roll * wK).toFixed(2);
-                    const sc = (1 - ease * 0.16).toFixed(3);
-                    const b = ease * L.blur + scrollWarp * (dofMobile ? 1.5 : 3.5); // DoF + motion blur
-                    L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + z + 'px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) scale(' + sc + ')';
-                    L.el.style.filter = b > 0.05 ? 'blur(' + b.toFixed(2) + 'px)' : 'none';
-                    L.el.style.opacity = (1 - focus * 0.5).toFixed(3);
-                }
+                const usable = vh * 0.84;                 // alto visible de la sección enfocada
+                const approach = Math.round(vh * 1.05);   // scroll que dura el vuelo entre secciones
+                zTotal = 0;
+                zBudget = zSecs.map((el, i) => {
+                    const b = {
+                        start: zTotal,
+                        approach: i === 0 ? 0 : approach,
+                        dwell: Math.max(0, el.offsetHeight - usable) + Math.round(vh * 0.22)
+                    };
+                    zTotal += b.approach + b.dwell;
+                    return b;
+                });
+                zTrack.style.height = Math.round(zTotal + vh) + 'px';
             }
 
-            // La línea se llena de rojo según viajas por dentro de la línea de tiempo,
-            // y va ENCENDIENDO cada hito cuando su frente lo alcanza (los pasados quedan encendidos)
+            // scrollY -> { p: posición sobre la línea Z (en secciones), inner[i]: lectura interna }
+            function zState(scrollY) {
+                const inner = new Array(zSecs.length).fill(0);
+                let p = 0;
+                for (let i = 0; i < zBudget.length; i++) {
+                    const b = zBudget[i];
+                    let rem = scrollY - b.start;
+                    if (rem <= 0) break;
+                    if (b.approach > 0) {
+                        const t = Math.min(1, rem / b.approach);
+                        p = (i - 1) + t * t * (3 - 2 * t); // smoothstep: desacelera al llegar
+                        rem -= b.approach;
+                        if (rem <= 0) break;
+                    }
+                    p = i;
+                    inner[i] = -Math.min(rem, b.dwell);
+                }
+                return { p: p, inner: inner };
+            }
+
+            const zNavLinks = document.querySelectorAll('.nav-link');
+            let zFocusedId = '';
+            function zRender() {
+                if (!zOn) return;
+                const vh = window.innerHeight;
+                const st = zState(window.scrollY);
+                const worldZ = st.p * SPACING;
+                let best = 0, bestD = Infinity;
+                for (let i = 0; i < zSecs.length; i++) {
+                    const el = zSecs[i];
+                    const z = worldZ - i * SPACING; // <0: al fondo del túnel · 0: enfocada · >0: atravesada
+                    const az = Math.abs(z);
+                    if (az < bestD) { bestD = az; best = i; }
+                    let op, bl;
+                    if (z >= 0) { // la estás atravesando: pasa a tu lado y desaparece
+                        op = 1 - Math.min(1, z / 460);
+                        bl = z / 60;
+                    } else {      // viene desde el fondo de la línea Z
+                        const dn = -z / SPACING;
+                        op = Math.max(0, 1 - dn * 0.78);
+                        bl = Math.min(12, dn * dn * 7);
+                    }
+                    bl += scrollWarp * (z >= 0 ? 3.5 : 1.6);
+                    if (zMobile) bl = Math.min(5, bl * 0.55);
+                    if (op <= 0.012 || z > 640) {
+                        el.style.visibility = 'hidden';
+                        el.style.pointerEvents = 'none';
+                        continue;
+                    }
+                    const baseY = Math.max((vh - el.offsetHeight) / 2, vh * 0.10);
+                    const yPx = baseY + st.inner[i] + (i === 0 ? hpMY : 0);
+                    const xPx = (i === 0 ? hpMX : 0);
+                    el.style.visibility = 'visible';
+                    el.style.transform = 'translate3d(calc(-50% + ' + xPx.toFixed(1) + 'px), ' + yPx.toFixed(1) + 'px, ' + z.toFixed(1) + 'px)';
+                    el.style.opacity = op.toFixed(3);
+                    el.style.filter = bl > 0.06 ? 'blur(' + Math.min(14, bl).toFixed(2) + 'px)' : 'none';
+                    el.style.pointerEvents = az < 260 ? 'auto' : 'none'; // solo interactúas con la enfocada
+                }
+                const fid = zSecs[best].id;
+                if (fid !== zFocusedId) {
+                    zFocusedId = fid;
+                    zNavLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === '#' + fid));
+                }
+                zUpdateTimeline(st);
+            }
+
+            // Línea de tiempo dentro del túnel: se llena y enciende hitos durante su fase de lectura
             const tlFill = document.getElementById('tl-line-fill');
             const tlWrap = document.querySelector('.tl-wrap');
             const tlItems = tlWrap ? Array.prototype.slice.call(tlWrap.querySelectorAll('.tl-item')) : [];
-            function updateTimelineLine() {
-                if (!tlFill || !tlWrap) return;
-                const top = docTop(tlWrap);
-                const p = Math.max(0, Math.min(1, (window.scrollY + window.innerHeight * 0.55 - top) / Math.max(1, tlWrap.offsetHeight)));
-                tlFill.style.height = (p * 100).toFixed(1) + '%';
-                const frontY = top + p * tlWrap.offsetHeight;
+            const tlIndex = zSecs.findIndex((s) => s.id === 'timeline');
+            function zUpdateTimeline(st) {
+                if (!tlFill || !tlWrap || tlIndex < 0) return;
+                const sec = zSecs[tlIndex];
+                const z = st.p * SPACING - tlIndex * SPACING;
+                let pr;
+                if (z < -SPACING * 0.5) pr = 0;
+                else if (z > 10) pr = 1;
+                else {
+                    const vh = window.innerHeight;
+                    const baseY = Math.max((vh - sec.offsetHeight) / 2, vh * 0.10);
+                    const frontY = vh * 0.62 - (baseY + st.inner[tlIndex]); // frente de lectura, en coords de la sección
+                    pr = Math.max(0, Math.min(1, (frontY - tlWrap.offsetTop) / Math.max(1, tlWrap.offsetHeight)));
+                }
+                tlFill.style.height = (pr * 100).toFixed(1) + '%';
+                const fY = tlWrap.offsetTop + pr * tlWrap.offsetHeight;
                 for (let i = 0; i < tlItems.length; i++) {
-                    tlItems[i].classList.toggle('tl-lit', docTop(tlItems[i]) + 30 <= frontY);
+                    tlItems[i].classList.toggle('tl-lit', tlWrap.offsetTop + tlItems[i].offsetTop + 30 <= fY);
                 }
             }
 
-            // rAF unificado + medidor de velocidad: navegar rápido enciende el WARP
-            // (motion blur + giro extra) y decae solo al frenar.
-            let parallaxTicking = false;
+            // Planificador rAF + medidor de velocidad: navegar rápido enciende el WARP
+            // (motion blur en el túnel) y decae solo al frenar.
+            let zTicking = false;
             let warpPrevY = window.scrollY, warpPrevT = performance.now(), warpRafOn = false;
             function decayWarp() {
                 scrollWarp *= 0.9;
                 if (scrollWarp < 0.02) { scrollWarp = 0; warpRafOn = false; }
-                applyHeroParallax();
-                applyParallaxLayers();
+                zRender();
                 if (warpRafOn) requestAnimationFrame(decayWarp);
             }
-            function onParallaxScroll() {
-                if (parallaxTicking) return;
-                parallaxTicking = true;
+            function requestZRender() {
+                if (zTicking || !zOn) return;
+                zTicking = true;
                 requestAnimationFrame(() => {
                     const y = window.scrollY, t = performance.now();
                     const v = Math.abs(y - warpPrevY) / Math.max(8, t - warpPrevT); // px/ms
                     scrollWarp = Math.min(1, Math.max(scrollWarp * 0.86, v * 0.5));
                     warpPrevY = y; warpPrevT = t;
-                    applyHeroParallax();
-                    applyParallaxLayers();
-                    updateTimelineLine();
-                    parallaxTicking = false;
+                    zRender();
+                    zTicking = false;
                     if (!warpRafOn && scrollWarp > 0.02) { warpRafOn = true; requestAnimationFrame(decayWarp); }
                 });
             }
-            if (!heroReduceMotion) {
-                window.addEventListener('scroll', onParallaxScroll, { passive: true });
-                window.addEventListener('resize', onParallaxScroll, { passive: true });
-                applyHeroParallax();
-                applyParallaxLayers();
-                updateTimelineLine();
+            if (zOn) {
+                document.body.classList.add('zmode');
+                zMeasure();
+                window.addEventListener('scroll', requestZRender, { passive: true });
+                window.addEventListener('resize', () => { zMeasure(); requestZRender(); }, { passive: true });
+                if (typeof ResizeObserver !== 'undefined') {
+                    // las imágenes/fuentes cambian las alturas -> re-medir presupuesto de scroll
+                    const ro = new ResizeObserver(() => { zMeasure(); requestZRender(); });
+                    zSecs.forEach((s) => ro.observe(s));
+                }
+                // Los enlaces #ancla vuelan por el túnel hasta el punto de enfoque de su sección
+                document.querySelectorAll('a[href^="#"]').forEach((a) => {
+                    a.addEventListener('click', (e) => {
+                        const id = (a.getAttribute('href') || '').slice(1);
+                        const i = zSecs.findIndex((s) => s.id === id);
+                        if (i < 0) return;
+                        e.preventDefault();
+                        window.scrollTo({ top: zBudget[i].start + zBudget[i].approach, behavior: 'smooth' });
+                    });
+                });
+                zRender();
             }
 
             // --- TARJETAS 3D: tilt + brillo que sigue al cursor (secciones inmersivas) ---
@@ -1485,7 +1560,7 @@
             const sections = document.querySelectorAll('section');
             const navLinks = document.querySelectorAll('.nav-link');
             const header = document.getElementById('header');
-            const updateActiveLink = () => { let currentSection = ''; const headerHeight = header.offsetHeight; sections.forEach(section => { const sectionTop = section.offsetTop - headerHeight - 50; if (window.scrollY >= sectionTop) { currentSection = section.getAttribute('id'); } }); navLinks.forEach(link => { link.classList.remove('active'); if (link.getAttribute('href').substring(1) === currentSection) { link.classList.add('active'); } }); };
+            const updateActiveLink = () => { if (document.body.classList.contains('zmode')) return; let currentSection = ''; const headerHeight = header.offsetHeight; sections.forEach(section => { const sectionTop = section.offsetTop - headerHeight - 50; if (window.scrollY >= sectionTop) { currentSection = section.getAttribute('id'); } }); navLinks.forEach(link => { link.classList.remove('active'); if (link.getAttribute('href').substring(1) === currentSection) { link.classList.add('active'); } }); };
             window.addEventListener('scroll', updateActiveLink);
             updateActiveLink();
 
