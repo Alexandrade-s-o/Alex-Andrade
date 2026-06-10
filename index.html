@@ -375,6 +375,40 @@
             #about img { animation: none !important; }
         }
 
+        /* LÍNEA DE TIEMPO 3D: viajas por DENTRO de la línea; cada hito llega desde la
+           profundidad, gira alrededor de la línea central y su punto se enciende al
+           quedar en foco. La línea se llena de rojo según avanzas. */
+        .tl-wrap { position: relative; padding: 1rem 0 2rem; }
+        .tl-line {
+            position: absolute; top: 0; bottom: 0; left: 11px; width: 3px;
+            background: var(--border); border-radius: 9999px; overflow: hidden;
+        }
+        .tl-line-fill {
+            width: 100%; height: 100%;
+            background: linear-gradient(180deg, #FF5252, var(--accent));
+            box-shadow: 0 0 16px rgba(188, 0, 45, 0.55);
+            border-radius: inherit;
+        }
+        .tl-item { position: relative; margin: 2.4rem 0; padding-left: 2.8rem; }
+        .tl-dot {
+            position: absolute; left: 4px; top: 1.35rem; width: 17px; height: 17px;
+            border-radius: 9999px; background: var(--bg); border: 3px solid var(--accent);
+            transition: background 0.25s ease, box-shadow 0.25s ease; z-index: 2;
+        }
+        .tl-lit .tl-dot { background: var(--accent); box-shadow: 0 0 18px rgba(188, 0, 45, 0.8); }
+        .tl-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.15rem 1.4rem; transition: border-color 0.25s ease; }
+        .tl-lit .tl-card { border-color: var(--accent); }
+        .tl-year { color: var(--accent); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; }
+        .tl-name { color: var(--text); font-weight: 700; font-size: 1.12rem; margin: 0.15rem 0 0.35rem; }
+        .tl-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.65; }
+        @media (min-width: 768px) {
+            .tl-line { left: 50%; transform: translateX(-50%); }
+            .tl-item { width: 50%; padding: 0 3rem 0 0; }
+            .tl-item .tl-dot { left: auto; right: -10px; }
+            .tl-right { margin-left: 50%; padding: 0 0 0 3rem; }
+            .tl-right .tl-dot { right: auto; left: -10px; }
+        }
+
         /* Navegación 3D: los clics del menú VUELAN por el mundo (scroll suave -> la cámara
            recorre todo el trayecto con warp, en vez de saltar de golpe) */
         @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
@@ -439,6 +473,7 @@
                 <nav class="hidden md:flex items-center space-x-8">
                     <a href="#home" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_home">Inicio</a>
                     <a href="#about" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_about">Sobre Mí</a>
+                    <a href="#timeline" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_timeline">Trayectoria</a>
                     <a href="#projects" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_projects">Proyectos</a>
                     <a href="#contact" class="nav-link text-sm text-soft hover:text-strong transition-colors duration-300" data-lang="nav_contact">Contacto</a>
                 </nav>
@@ -456,6 +491,7 @@
             <div id="mobile-menu" class="md:hidden hidden border-t border-card mt-3 pt-2 pb-1 flex flex-col">
                 <a href="#home" class="nav-link py-3 text-soft" data-lang="nav_home">Inicio</a>
                 <a href="#about" class="nav-link py-3 text-soft" data-lang="nav_about">Sobre Mí</a>
+                <a href="#timeline" class="nav-link py-3 text-soft" data-lang="nav_timeline">Trayectoria</a>
                 <a href="#projects" class="nav-link py-3 text-soft" data-lang="nav_projects">Proyectos</a>
                 <a href="#contact" class="nav-link py-3 text-soft" data-lang="nav_contact">Contacto</a>
             </div>
@@ -549,6 +585,66 @@
                     </div>
                 </div>
              </div>
+        </section>
+
+        <!-- Sección Timeline: viaje por DENTRO de la línea de tiempo -->
+        <section id="timeline" class="py-28 md:py-40 container mx-auto px-6">
+            <div class="tl-head max-w-2xl mb-14">
+                <p class="eyebrow mb-3" data-lang="tl_eyebrow">Mi camino</p>
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-strong mb-4" data-lang="tl_title">Línea de tiempo</h2>
+                <p class="text-muted leading-relaxed" data-lang="tl_subtitle">Scrollea y viaja por dentro de la línea: cada hito llega desde el fondo y se enciende al pasar.</p>
+            </div>
+            <div class="tl-wrap max-w-4xl mx-auto">
+                <div class="tl-line"><div class="tl-line-fill" id="tl-line-fill"></div></div>
+                <div class="tl-item">
+                    <span class="tl-dot"></span>
+                    <div class="tl-card">
+                        <span class="tl-year" data-lang="tl1_year">2025</span>
+                        <h3 class="tl-name" data-lang="tl1_title">Primer portafolio</h3>
+                        <p class="tl-desc" data-lang="tl1_desc">Publico mis primeras páginas con HTML y CSS y descubro que lo mío es construir para la web.</p>
+                    </div>
+                </div>
+                <div class="tl-item tl-right">
+                    <span class="tl-dot"></span>
+                    <div class="tl-card">
+                        <span class="tl-year" data-lang="tl2_year">Feb 2026</span>
+                        <h3 class="tl-name" data-lang="tl2_title">Primeros deploys en la nube</h3>
+                        <p class="tl-desc" data-lang="tl2_desc">Malezarap y varios experimentos: empiezo a publicar todos mis proyectos en Vercel.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-dot"></span>
+                    <div class="tl-card">
+                        <span class="tl-year" data-lang="tl3_year">Mar 2026</span>
+                        <h3 class="tl-name" data-lang="tl3_title">Salto a TypeScript</h3>
+                        <p class="tl-desc" data-lang="tl3_desc">Cromia: interfaces más ambiciosas, con tipado y mejores herramientas.</p>
+                    </div>
+                </div>
+                <div class="tl-item tl-right">
+                    <span class="tl-dot"></span>
+                    <div class="tl-card">
+                        <span class="tl-year" data-lang="tl4_year">Abr – May 2026</span>
+                        <h3 class="tl-name" data-lang="tl4_title">Sitios completos</h3>
+                        <p class="tl-desc" data-lang="tl4_desc">Boskes y Solidar: proyectos de punta a punta, del diseño al deploy.</p>
+                    </div>
+                </div>
+                <div class="tl-item">
+                    <span class="tl-dot"></span>
+                    <div class="tl-card">
+                        <span class="tl-year" data-lang="tl5_year">Jun 2026</span>
+                        <h3 class="tl-name" data-lang="tl5_title">Apps con datos reales</h3>
+                        <p class="tl-desc" data-lang="tl5_desc">Casa Azul y ConstructPrice: aplicaciones que resuelven problemas concretos.</p>
+                    </div>
+                </div>
+                <div class="tl-item tl-right">
+                    <span class="tl-dot"></span>
+                    <div class="tl-card">
+                        <span class="tl-year" data-lang="tl6_year">Hoy</span>
+                        <h3 class="tl-name" data-lang="tl6_title">Este portafolio 3D</h3>
+                        <p class="tl-desc" data-lang="tl6_desc">Una experiencia inmersiva con Three.js: mundo blanco y rojo, profundidad de campo y warp.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- Sección Projects con Carrusel -->
@@ -1046,7 +1142,15 @@
             // --- DICCIONARIO DE TEXTOS ---
             const translations = {
                 es: {
-                    nav_home: "Inicio", nav_about: "Sobre Mí", nav_projects: "Proyectos", nav_contact: "Contacto",
+                    nav_home: "Inicio", nav_about: "Sobre Mí", nav_timeline: "Trayectoria", nav_projects: "Proyectos", nav_contact: "Contacto",
+                    tl_eyebrow: "Mi camino", tl_title: "Línea de tiempo",
+                    tl_subtitle: "Scrollea y viaja por dentro de la línea: cada hito llega desde el fondo y se enciende al pasar.",
+                    tl1_year: "2025", tl1_title: "Primer portafolio", tl1_desc: "Publico mis primeras páginas con HTML y CSS y descubro que lo mío es construir para la web.",
+                    tl2_year: "Feb 2026", tl2_title: "Primeros deploys en la nube", tl2_desc: "Malezarap y varios experimentos: empiezo a publicar todos mis proyectos en Vercel.",
+                    tl3_year: "Mar 2026", tl3_title: "Salto a TypeScript", tl3_desc: "Cromia: interfaces más ambiciosas, con tipado y mejores herramientas.",
+                    tl4_year: "Abr – May 2026", tl4_title: "Sitios completos", tl4_desc: "Boskes y Solidar: proyectos de punta a punta, del diseño al deploy.",
+                    tl5_year: "Jun 2026", tl5_title: "Apps con datos reales", tl5_desc: "Casa Azul y ConstructPrice: aplicaciones que resuelven problemas concretos.",
+                    tl6_year: "Hoy", tl6_title: "Este portafolio 3D", tl6_desc: "Una experiencia inmersiva con Three.js: mundo blanco y rojo, profundidad de campo y warp.",
                     hero_eyebrow: "Alex Andrade — Desarrollo Web Multimedia",
                     hero_title_pre: "Desarrollador", hero_subtitle: "Creo experiencias web interactivas e inmersivas, uniendo código, diseño y animación para construir interfaces que comunican y cautivan.",
                     hero_btn_projects: "Ver Mis Proyectos", hero_btn_contact: "Contáctame",
@@ -1063,7 +1167,15 @@
                     footer_text: "© 2025 Alex Andrade. Todos los derechos reservados."
                 },
                 en: {
-                    nav_home: "Home", nav_about: "About Me", nav_projects: "Projects", nav_contact: "Contact",
+                    nav_home: "Home", nav_about: "About Me", nav_timeline: "Journey", nav_projects: "Projects", nav_contact: "Contact",
+                    tl_eyebrow: "My path", tl_title: "Timeline",
+                    tl_subtitle: "Scroll to travel inside the line: every milestone arrives from the depth and lights up as you pass.",
+                    tl1_year: "2025", tl1_title: "First portfolio", tl1_desc: "I publish my first pages with HTML and CSS and discover that building for the web is my thing.",
+                    tl2_year: "Feb 2026", tl2_title: "First cloud deploys", tl2_desc: "Malezarap and several experiments: I start shipping all my projects on Vercel.",
+                    tl3_year: "Mar 2026", tl3_title: "Jump to TypeScript", tl3_desc: "Cromia: more ambitious interfaces, with types and better tooling.",
+                    tl4_year: "Apr – May 2026", tl4_title: "End-to-end sites", tl4_desc: "Boskes and Solidar: full projects, from design to deploy.",
+                    tl5_year: "Jun 2026", tl5_title: "Apps with real data", tl5_desc: "Casa Azul and ConstructPrice: applications that solve concrete problems.",
+                    tl6_year: "Today", tl6_title: "This 3D portfolio", tl6_desc: "An immersive Three.js experience: white-and-red world, depth of field and warp.",
                     hero_eyebrow: "Alex Andrade — Multimedia Web Development",
                     hero_title_pre: "Developer", hero_subtitle: "I build interactive, immersive web experiences — blending code, design and animation to craft interfaces that communicate and captivate.",
                     hero_btn_projects: "View My Projects", hero_btn_contact: "Contact Me",
@@ -1215,6 +1327,12 @@
             }
             if (!heroReduceMotion) {
                 addSectionDepth('#about, #skills, #projects, #contact');
+                addSectionDepth('#timeline .tl-head');
+                // Los HITOS viajan POR DENTRO de la línea de tiempo: cada uno llega desde la
+                // profundidad girando alrededor de la línea y se enciende al quedar en foco.
+                addSectionDepth('#timeline .tl-item', dofMobile
+                    ? { z: 1000, tilt: 12, roll: 7, persp: 900, blur: 2 }
+                    : { z: 2000, tilt: 24, roll: 14, persp: 900, blur: 3.5 });
             }
             // NAVEGACIÓN 3D POTENTE: la sección enfocada está al FRENTE, nítida y a tamaño
             // completo; al navegar sale disparada HACIA EL FONDO girando (rotateX/rotateY),
@@ -1243,6 +1361,22 @@
                 }
             }
 
+            // La línea se llena de rojo según viajas por dentro de la línea de tiempo,
+            // y va ENCENDIENDO cada hito cuando su frente lo alcanza (los pasados quedan encendidos)
+            const tlFill = document.getElementById('tl-line-fill');
+            const tlWrap = document.querySelector('.tl-wrap');
+            const tlItems = tlWrap ? Array.prototype.slice.call(tlWrap.querySelectorAll('.tl-item')) : [];
+            function updateTimelineLine() {
+                if (!tlFill || !tlWrap) return;
+                const top = docTop(tlWrap);
+                const p = Math.max(0, Math.min(1, (window.scrollY + window.innerHeight * 0.55 - top) / Math.max(1, tlWrap.offsetHeight)));
+                tlFill.style.height = (p * 100).toFixed(1) + '%';
+                const frontY = top + p * tlWrap.offsetHeight;
+                for (let i = 0; i < tlItems.length; i++) {
+                    tlItems[i].classList.toggle('tl-lit', docTop(tlItems[i]) + 30 <= frontY);
+                }
+            }
+
             // rAF unificado + medidor de velocidad: navegar rápido enciende el WARP
             // (motion blur + giro extra) y decae solo al frenar.
             let parallaxTicking = false;
@@ -1264,6 +1398,7 @@
                     warpPrevY = y; warpPrevT = t;
                     applyHeroParallax();
                     applyParallaxLayers();
+                    updateTimelineLine();
                     parallaxTicking = false;
                     if (!warpRafOn && scrollWarp > 0.02) { warpRafOn = true; requestAnimationFrame(decayWarp); }
                 });
@@ -1273,6 +1408,7 @@
                 window.addEventListener('resize', onParallaxScroll, { passive: true });
                 applyHeroParallax();
                 applyParallaxLayers();
+                updateTimelineLine();
             }
 
             // --- TARJETAS 3D: tilt + brillo que sigue al cursor (secciones inmersivas) ---
