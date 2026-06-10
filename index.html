@@ -375,6 +375,10 @@
             #about img { animation: none !important; }
         }
 
+        /* Navegación 3D: los clics del menú VUELAN por el mundo (scroll suave -> la cámara
+           recorre todo el trayecto con warp, en vez de saltar de golpe) */
+        @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
         /* Proyectos: carrusel HORIZONTAL con preview de cada web */
         .proj-scroll-wrap { position: relative; }
         .h-scroll {
@@ -883,6 +887,12 @@
                 if (!reduceMotion) time += dt;
                 sP += (scrollP - sP) * (reduceMotion ? 1 : 0.08);
 
+                // WARP: cuanto más lejos está la cámara de su destino (navegación rápida),
+                // más se abre el FOV (sensación de velocidad) y más corren las estrellas.
+                const navWarp = reduceMotion ? 0 : Math.min(1, Math.abs(scrollP - sP) * 20);
+                camera.fov += ((72 + navWarp * 26) - camera.fov) * 0.14;
+                camera.updateProjectionMatrix();
+
                 uniforms.u_time.value = time;
                 uniforms.u_mouse.value.lerp(targetMouse, 0.04);
                 uniforms.u_scroll.value += (sP - uniforms.u_scroll.value) * (reduceMotion ? 1 : 0.06);
@@ -900,7 +910,7 @@
                 const arr = starGeo.attributes.position.array;
                 const cx = camera.position.x, cy = camera.position.y, cz = camera.position.z;
                 for (let i = 0; i < STAR_COUNT; i++) {
-                    if (!reduceMotion) arr[i * 3 + 2] += sSpd[i];
+                    if (!reduceMotion) arr[i * 3 + 2] += sSpd[i] * (1 + navWarp * 16);
                     const dz = arr[i * 3 + 2] - cz;
                     if (dz > SPAN * 0.5) arr[i * 3 + 2] -= SPAN; else if (dz < -SPAN * 0.5) arr[i * 3 + 2] += SPAN;
                     const dx = arr[i * 3] - cx;
@@ -1153,13 +1163,16 @@
             const heroSpotlight = document.getElementById('hero-spotlight');
             const heroParallax = document.getElementById('hero-parallax');
             let hpMX = 0, hpMY = 0;
-            // El texto del hero se ALEJA hacia dentro del espacio 3D (translateZ) al hacer scroll
+            // 'scrollWarp' = velocidad de navegación (0..1): alimenta el efecto warp de toda la página
+            let scrollWarp = 0;
+            // El texto del hero se LANZA hacia el fondo del espacio 3D al hacer scroll
             function applyHeroParallax() {
                 if (!heroParallax) return;
-                const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.9));
-                heroParallax.style.transform = 'perspective(1100px) translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 30).toFixed(1) + 'px,' + (-hp * 600).toFixed(0) + 'px) rotateX(' + (hp * 6).toFixed(1) + 'deg)';
-                heroParallax.style.opacity = (1 - hp * 0.9).toFixed(3);
-                heroParallax.style.filter = hp > 0.02 ? 'blur(' + (hp * hp * 5).toFixed(2) + 'px)' : 'none'; // profundidad de campo al alejarse
+                const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.85));
+                heroParallax.style.transform = 'perspective(950px) translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 46).toFixed(1) + 'px,' + (-hp * 1500).toFixed(0) + 'px) rotateX(' + (hp * 16).toFixed(1) + 'deg)';
+                heroParallax.style.opacity = (1 - hp * 0.95).toFixed(3);
+                const hb = hp * hp * 9 + scrollWarp * 3;
+                heroParallax.style.filter = hb > 0.05 ? 'blur(' + hb.toFixed(2) + 'px)' : 'none'; // profundidad de campo + warp
             }
             if (heroSection && !heroReduceMotion) {
                 if (heroParallax) heroParallax.style.willChange = 'transform, opacity';
@@ -1192,21 +1205,24 @@
                     el.style.transformOrigin = '50% 50%';
                     parallaxLayers.push({
                         el: el,
-                        z: cfg.z || 900,
-                        tilt: cfg.tilt || 0,
-                        persp: cfg.persp || 1100,
-                        blur: cfg.blur != null ? cfg.blur : (dofMobile ? 1.5 : 3)
+                        z: cfg.z || (dofMobile ? 1300 : 2600),
+                        tilt: cfg.tilt != null ? cfg.tilt : (dofMobile ? 14 : 26),
+                        roll: cfg.roll != null ? cfg.roll : (dofMobile ? 4 : 9),
+                        persp: cfg.persp || 1000,
+                        blur: cfg.blur != null ? cfg.blur : (dofMobile ? 2 : 4)
                     });
                 });
             }
             if (!heroReduceMotion) {
                 addSectionDepth('#about, #skills, #projects, #contact');
             }
-            // SCROLL CON PROFUNDIDAD DE CAMPO (eje Z): la sección enfocada está al FRENTE y
-            // nítida; al hacer scroll se va HACIA ATRÁS y se desenfoca (depth of field), y la
-            // siguiente llega desde el fondo. Movimiento de adelante hacia atrás en profundidad.
+            // NAVEGACIÓN 3D POTENTE: la sección enfocada está al FRENTE, nítida y a tamaño
+            // completo; al navegar sale disparada HACIA EL FONDO girando (rotateX/rotateY),
+            // encogiéndose y desenfocándose, mientras la siguiente llega desde la profundidad.
+            // 'scrollWarp' añade motion blur y más giro cuanto más rápido navegas.
             function applyParallaxLayers() {
                 const vh = window.innerHeight;
+                const wK = 1 + scrollWarp * 0.9; // el warp exagera el giro
                 for (let i = 0; i < parallaxLayers.length; i++) {
                     const L = parallaxLayers[i];
                     // 'rel' desde la posición de LAYOUT (no del rect transformado) -> sin realimentación
@@ -1214,25 +1230,42 @@
                     let rel = (center - vh / 2) / vh;
                     rel = Math.max(-1, Math.min(1, rel));
                     const d = Math.abs(rel);
-                    const focus = Math.max(0, (d - 0.2) / 0.8); // 0 = en foco (zona nítida central)
-                    const z = (-focus * L.z).toFixed(0);         // se va hacia atrás al perder foco
-                    const blur = (focus * focus * L.blur).toFixed(2); // PROFUNDIDAD DE CAMPO
-                    const rx = L.tilt ? ' rotateX(' + (rel * L.tilt).toFixed(2) + 'deg)' : '';
-                    L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + z + 'px)' + rx;
-                    L.el.style.filter = focus > 0.01 ? 'blur(' + blur + 'px)' : 'none';
-                    L.el.style.opacity = (1 - focus * 0.4).toFixed(3);
+                    const focus = Math.max(0, (d - 0.18) / 0.82); // 0 = en foco (zona nítida central)
+                    const ease = focus * focus;                    // acelera al salir del foco
+                    const z = (-(0.35 * focus + 0.65 * ease) * L.z).toFixed(0);
+                    const rx = (rel * L.tilt * wK).toFixed(2);
+                    const ry = (-rel * L.roll * wK).toFixed(2);
+                    const sc = (1 - ease * 0.16).toFixed(3);
+                    const b = ease * L.blur + scrollWarp * (dofMobile ? 1.5 : 3.5); // DoF + motion blur
+                    L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + z + 'px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) scale(' + sc + ')';
+                    L.el.style.filter = b > 0.05 ? 'blur(' + b.toFixed(2) + 'px)' : 'none';
+                    L.el.style.opacity = (1 - focus * 0.5).toFixed(3);
                 }
             }
 
-            // rAF unificado para todo el parallax ligado al scroll (hero + capas de texto)
+            // rAF unificado + medidor de velocidad: navegar rápido enciende el WARP
+            // (motion blur + giro extra) y decae solo al frenar.
             let parallaxTicking = false;
+            let warpPrevY = window.scrollY, warpPrevT = performance.now(), warpRafOn = false;
+            function decayWarp() {
+                scrollWarp *= 0.9;
+                if (scrollWarp < 0.02) { scrollWarp = 0; warpRafOn = false; }
+                applyHeroParallax();
+                applyParallaxLayers();
+                if (warpRafOn) requestAnimationFrame(decayWarp);
+            }
             function onParallaxScroll() {
                 if (parallaxTicking) return;
                 parallaxTicking = true;
                 requestAnimationFrame(() => {
+                    const y = window.scrollY, t = performance.now();
+                    const v = Math.abs(y - warpPrevY) / Math.max(8, t - warpPrevT); // px/ms
+                    scrollWarp = Math.min(1, Math.max(scrollWarp * 0.86, v * 0.5));
+                    warpPrevY = y; warpPrevT = t;
                     applyHeroParallax();
                     applyParallaxLayers();
                     parallaxTicking = false;
+                    if (!warpRafOn && scrollWarp > 0.02) { warpRafOn = true; requestAnimationFrame(decayWarp); }
                 });
             }
             if (!heroReduceMotion) {
