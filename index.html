@@ -385,7 +385,7 @@
             overflow: hidden;
         }
         body.zmode main > section {
-            position: absolute; left: 50%; top: 0;
+            position: absolute; left: 0; top: 0;
             width: min(1160px, 94vw);
             margin: 0;
             will-change: transform, opacity, filter;
@@ -1382,30 +1382,39 @@
                     const z = worldZ - i * SPACING; // <0: al fondo del túnel · 0: enfocada · >0: atravesada
                     const az = Math.abs(z);
                     if (az < bestD) { bestD = az; best = i; }
-                    let op, bl;
-                    if (z >= 0) { // la estás atravesando: pasa a tu lado y desaparece
-                        op = 1 - Math.min(1, z / 460);
-                        bl = z / 60;
-                    } else {      // viene desde el fondo de la línea Z
-                        const dn = -z / SPACING;
-                        op = Math.max(0, 1 - dn * 0.78);
-                        bl = Math.min(12, dn * dn * 7);
-                    }
-                    bl += scrollWarp * (z >= 0 ? 3.5 : 1.6);
-                    if (zMobile) bl = Math.min(5, bl * 0.55);
-                    if (op <= 0.012 || z > 640) {
+                    try {
+                        let op, bl;
+                        if (z >= 0) { // la estás atravesando: pasa a tu lado y desaparece
+                            op = 1 - Math.min(1, z / 460);
+                            bl = z / 60;
+                        } else {      // viene desde el fondo de la línea Z
+                            const dn = -z / SPACING;
+                            op = Math.max(0, 1 - dn * 0.9);
+                            bl = Math.min(12, dn * dn * 7);
+                        }
+                        bl += scrollWarp * (z >= 0 ? 3.5 : 1.6);
+                        if (zMobile) bl = Math.min(5, bl * 0.55);
+                        const baseY = Math.max((vh - el.offsetHeight) / 2, vh * 0.10);
+                        const yPx = baseY + st.inner[i] + (i === 0 ? hpMY : 0);
+                        const xPx = (window.innerWidth - el.offsetWidth) / 2 + (i === 0 ? hpMX : 0);
+                        if (op <= 0.012 || z > 640 || !isFinite(z) || !isFinite(yPx) || !isFinite(xPx)) {
+                            el.style.visibility = 'hidden';
+                            el.style.pointerEvents = 'none';
+                            continue;
+                        }
+                        // Transform en PX puros (sin calc/%) por máxima compatibilidad. La sección
+                        // solo se muestra si el navegador ACEPTÓ el transform: jamás puede quedar
+                        // visible sin posicionar (apilada).
+                        el.style.transform = 'translate3d(' + xPx.toFixed(1) + 'px, ' + yPx.toFixed(1) + 'px, ' + z.toFixed(1) + 'px)';
+                        if (!el.style.transform) { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none'; continue; }
+                        el.style.opacity = op.toFixed(3);
+                        el.style.filter = bl > 0.06 ? 'blur(' + Math.min(14, bl).toFixed(2) + 'px)' : 'none';
+                        el.style.pointerEvents = az < 260 ? 'auto' : 'none'; // solo interactúas con la enfocada
+                        el.style.visibility = 'visible';
+                    } catch (err) {
                         el.style.visibility = 'hidden';
                         el.style.pointerEvents = 'none';
-                        continue;
                     }
-                    const baseY = Math.max((vh - el.offsetHeight) / 2, vh * 0.10);
-                    const yPx = baseY + st.inner[i] + (i === 0 ? hpMY : 0);
-                    const xPx = (i === 0 ? hpMX : 0);
-                    el.style.visibility = 'visible';
-                    el.style.transform = 'translate3d(calc(-50% + ' + xPx.toFixed(1) + 'px), ' + yPx.toFixed(1) + 'px, ' + z.toFixed(1) + 'px)';
-                    el.style.opacity = op.toFixed(3);
-                    el.style.filter = bl > 0.06 ? 'blur(' + Math.min(14, bl).toFixed(2) + 'px)' : 'none';
-                    el.style.pointerEvents = az < 260 ? 'auto' : 'none'; // solo interactúas con la enfocada
                 }
                 const fid = zSecs[best].id;
                 if (fid !== zFocusedId) {
@@ -1465,9 +1474,21 @@
             }
             if (zOn) {
                 document.body.classList.add('zmode');
+                // Cinturón y tirantes: posicionamiento también inline (por si alguna hoja CSS
+                // externa pisara las reglas .zmode) y todo oculto hasta el primer render.
+                zSecs.forEach((s) => {
+                    s.style.position = 'absolute';
+                    s.style.left = '0';
+                    s.style.top = '0';
+                    s.style.width = 'min(1160px, 94vw)';
+                    s.style.margin = '0';
+                    s.style.visibility = 'hidden';
+                });
                 zMeasure();
                 window.addEventListener('scroll', requestZRender, { passive: true });
                 window.addEventListener('resize', () => { zMeasure(); requestZRender(); }, { passive: true });
+                window.addEventListener('load', () => { zMeasure(); zRender(); });
+                window.addEventListener('pageshow', () => { zMeasure(); zRender(); });
                 if (typeof ResizeObserver !== 'undefined') {
                     // las imágenes/fuentes cambian las alturas -> re-medir presupuesto de scroll
                     const ro = new ResizeObserver(() => { zMeasure(); requestZRender(); });
