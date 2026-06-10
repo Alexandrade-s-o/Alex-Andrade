@@ -14,8 +14,8 @@
         /* ===== TEMA CLARO (por defecto) ===== */
         :root {
             --bg: #FFFFFF;
-            --text: #0F172A;
-            --muted: #475569;
+            --text: #0A0F1E;
+            --muted: #334155;
             --accent: #BC002D;
             --font-display: 'Space Grotesk', 'Inter', sans-serif;
             --card: #FFFFFF;
@@ -23,12 +23,12 @@
             --header-bg: rgba(255, 255, 255, 0.72);
             --icon-bg: #EEF2F8;
             --btn-sec-border: rgba(15, 23, 42, 0.16);
-            --code-text: #334155;
+            --code-text: #1E293B;
             --code-shadow: rgba(255, 255, 255, 0.85);
             --spotlight: rgba(188, 0, 45, 0.12);
             --tok-kw: #9333ea; --tok-var: #2563eb; --tok-prop: #0e7490;
             --tok-str: #15803d; --tok-punc: #0891b2; --tok-fn: #b45309; --tok-num: #c2410c;
-            --card-shadow: 0 22px 48px -30px rgba(2, 6, 23, 0.40);
+            --card-shadow: 0 16px 36px -28px rgba(2, 6, 23, 0.28);
             --glass-bg: rgba(255, 255, 255, 0.92);
             --glass-border: rgba(15, 23, 42, 0.12);
             --glass-blur: 14px;
@@ -36,8 +36,8 @@
         /* ===== TEMA OSCURO (Antigravity) ===== */
         :root[data-theme="dark"] {
             --bg: #05070D;
-            --text: #E7EBF3;
-            --muted: #8A93A6;
+            --text: #F2F5FA;
+            --muted: #AAB4C6;
             --accent: #FF4D5E;
             --card: #0B0F18;
             --border: #1A2030;
@@ -77,6 +77,15 @@
             font-family: var(--font-display);
             letter-spacing: -0.02em;
         }
+        /* Legibilidad: cuerpo un punto más grande y párrafos con más aire */
+        body { font-size: 1.0625rem; }
+        main section p { line-height: 1.75; }
+        /* Detalle minimalista (hinomaru): barra roja breve bajo cada título de sección */
+        main section h2 { position: relative; padding-bottom: 0.9rem; }
+        main section h2::after {
+            content: ''; position: absolute; left: 0; bottom: 0;
+            width: 44px; height: 3px; border-radius: 2px; background: var(--accent);
+        }
         .bg-card { background-color: var(--card); }
         .border-card { border-color: var(--border); }
         .text-muted { color: var(--muted); }
@@ -102,7 +111,10 @@
             z-index: -1;
             pointer-events: none;
             display: block;
+            /* Fondo más discreto: el contenido manda, la red 3D acompaña */
+            opacity: 0.82;
         }
+        :root[data-theme="dark"] #bg-canvas-3d { opacity: 0.55; }
 
         /* Capa de "polvo" 3D POR DELANTE del contenido: el contenido queda dentro del 3D */
         #fg-dust {
@@ -1283,7 +1295,7 @@
                 const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.85));
                 heroParallax.style.transform = 'perspective(950px) translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 46).toFixed(1) + 'px,' + (-hp * 1500).toFixed(0) + 'px) rotateX(' + (hp * 16).toFixed(1) + 'deg)';
                 heroParallax.style.opacity = (1 - hp * 0.95).toFixed(3);
-                const hb = hp * hp * 9 + scrollWarp * 3;
+                const hb = hp * hp * 7 + scrollWarp * 2;
                 heroParallax.style.filter = hb > 0.05 ? 'blur(' + hb.toFixed(2) + 'px)' : 'none'; // profundidad de campo + warp
             }
             if (heroSection && !heroReduceMotion) {
@@ -1321,7 +1333,7 @@
                         tilt: cfg.tilt != null ? cfg.tilt : 0,
                         roll: cfg.roll != null ? cfg.roll : 0,
                         persp: cfg.persp || 1100,
-                        blur: cfg.blur != null ? cfg.blur : (dofMobile ? 2.5 : 5)
+                        blur: cfg.blur != null ? cfg.blur : (dofMobile ? 2 : 3.5)
                     });
                 });
             }
@@ -1347,22 +1359,24 @@
                     const center = docTop(L.el) + L.el.offsetHeight / 2 - window.scrollY;
                     const rel = (center - vh / 2) / vh; // >0: aún al fondo · ~0: enfocada · <0: pasada
                     let zPx, op, bl, rx = 0, ry = 0;
-                    if (rel > 0.14) {        // viene desde el fondo de la línea Z
-                        const t = Math.min(1, (rel - 0.14) / 0.86);
+                    // Zona de LECTURA amplia (±0.32 de viewport): mientras lees, la sección está
+                    // nítida, opaca y quieta. El viaje en Z ocurre fuera de esa zona.
+                    if (rel > 0.32) {        // viene desde el fondo de la línea Z
+                        const t = Math.min(1, (rel - 0.32) / 0.68);
                         zPx = -t * L.z;
                         op = 1 - t * 0.92;
                         bl = t * t * L.blur;
                         rx = -t * L.tilt; ry = t * L.roll;
-                    } else if (rel < -0.14) { // la estás atravesando: viene HACIA ti y desaparece
-                        const t = Math.min(1, (-rel - 0.14) / 0.5);
+                    } else if (rel < -0.32) { // la estás atravesando: viene HACIA ti y desaparece
+                        const t = Math.min(1, (-rel - 0.32) / 0.45);
                         zPx = t * 560;
                         op = 1 - t;
-                        bl = t * 4.5;
+                        bl = t * 3;
                         rx = t * L.tilt * 0.5; ry = -t * L.roll * 0.5;
                     } else {                  // enfocada: nítida, quieta, frente a ti
                         zPx = 0; op = 1; bl = 0;
                     }
-                    bl += scrollWarp * 2.5; // motion blur al navegar rápido
+                    bl += scrollWarp * 1.5; // motion blur sutil al navegar rápido
                     L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + zPx.toFixed(0) + 'px)' +
                         (rx ? ' rotateX(' + rx.toFixed(2) + 'deg)' : '') + (ry ? ' rotateY(' + ry.toFixed(2) + 'deg)' : '');
                     L.el.style.opacity = Math.max(0, op).toFixed(3);
