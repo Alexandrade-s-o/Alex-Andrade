@@ -111,10 +111,10 @@
             z-index: -1;
             pointer-events: none;
             display: block;
-            /* Fondo más discreto: el contenido manda, la red 3D acompaña */
-            opacity: 0.82;
+            /* Minimal: el campo rojo manda; la red 3D apenas se insinúa (ma / espacio vacío) */
+            opacity: 0.45;
         }
-        :root[data-theme="dark"] #bg-canvas-3d { opacity: 0.55; }
+        :root[data-theme="dark"] #bg-canvas-3d { opacity: 0.4; }
 
         /* Capa de "polvo" 3D POR DELANTE del contenido: el contenido queda dentro del 3D */
         #fg-dust {
@@ -445,14 +445,14 @@
             will-change: translate;
         }
         .float-card:hover { border-color: var(--accent); }
-        .f1 { --fdur: 7.2s; --fdel: 0s;    --frot: -1.3deg; }
-        .f2 { --fdur: 8.6s; --fdel: -2.1s; --frot: 1.1deg;  margin-top: 3.2rem; }
-        .f3 { --fdur: 7.9s; --fdel: -4.3s; --frot: -0.7deg; margin-top: 1.1rem; }
-        .f4 { --fdur: 9.1s; --fdel: -1.2s; --frot: 1.4deg;  margin-top: 3.8rem; }
-        .f5 { --fdur: 8.3s; --fdel: -3.2s; --frot: -1deg;   margin-top: 0.8rem; }
+        .f1 { --fdur: 10s;   --fdel: 0s;    --frot: -0.6deg; }
+        .f2 { --fdur: 11s;   --fdel: -2.5s; --frot: 0.5deg;  margin-top: 1.6rem; }
+        .f3 { --fdur: 10.5s; --fdel: -5s;   --frot: -0.4deg; margin-top: 0.6rem; }
+        .f4 { --fdur: 11.5s; --fdel: -1.5s; --frot: 0.6deg;  margin-top: 1.8rem; }
+        .f5 { --fdur: 10.2s; --fdel: -3.5s; --frot: -0.5deg; margin-top: 0.4rem; }
         @keyframes fc-float {
             0%, 100% { translate: 0 0; }
-            50% { translate: 0 -13px; }
+            50% { translate: 0 -6px; }
         }
         .fc-bar {
             display: flex; align-items: center; gap: 6px;
@@ -842,7 +842,7 @@
             const glowMat = (d, l, size, od, ol) => tMat(new THREE.PointsMaterial({ size: size, map: dotTex, transparent: true, depthWrite: false, sizeAttenuation: true }), d, l, od, ol);
 
             // --- Campo de estrellas envolvente e infinito (siempre rodea la cámara) ---
-            const STAR_COUNT = isMobile ? 600 : 1400;
+            const STAR_COUNT = isMobile ? 320 : 750;
             const FIELD = 1700, SPAN = 3000;
             const sPos = new Float32Array(STAR_COUNT * 3);
             const sCol = new Float32Array(STAR_COUNT * 3);
@@ -1117,7 +1117,7 @@
             const spriteLight = makeSprite('232,184,75');  // oro sobre rojo laca
             const spriteDark = makeSprite('250,231,190');  // oro pálido sobre negro
 
-            const N = isMobile ? 22 : 45;
+            const N = isMobile ? 10 : 22;
             const dust = [];
             for (let i = 0; i < N; i++) {
                 const z = 0.3 + Math.random() * 0.7; // profundidad: mayor = más cerca/grande/rápido
@@ -1126,7 +1126,7 @@
                     r: (0.6 + Math.random() * 1.8) * z,
                     vx: (Math.random() - 0.5) * 0.15 * z,
                     vy: (-0.05 - Math.random() * 0.12) * z,
-                    a: 0.04 + Math.random() * 0.07
+                    a: 0.025 + Math.random() * 0.045
                 });
             }
 
@@ -1309,7 +1309,7 @@
                 const hp = Math.min(1, window.scrollY / (window.innerHeight * 0.85));
                 heroParallax.style.transform = 'perspective(950px) translate3d(' + hpMX.toFixed(1) + 'px,' + (hpMY - hp * 46).toFixed(1) + 'px,' + (-hp * 1500).toFixed(0) + 'px) rotateX(' + (hp * 16).toFixed(1) + 'deg)';
                 heroParallax.style.opacity = (1 - hp * 0.95).toFixed(3);
-                const hb = hp * hp * 7 + scrollWarp * 2;
+                const hb = hp * hp * 5 + scrollWarp * 1.2;
                 heroParallax.style.filter = hb > 0.05 ? 'blur(' + hb.toFixed(2) + 'px)' : 'none'; // profundidad de campo + warp
             }
             if (heroSection && !heroReduceMotion) {
@@ -1390,7 +1390,7 @@
                     } else {                  // enfocada: nítida, quieta, frente a ti
                         zPx = 0; op = 1; bl = 0;
                     }
-                    bl += scrollWarp * 1.5; // motion blur sutil al navegar rápido
+                    bl += scrollWarp * 0.8; // motion blur muy sutil al navegar rápido
                     L.el.style.transform = 'perspective(' + L.persp + 'px) translate3d(0,0,' + zPx.toFixed(0) + 'px)' +
                         (rx ? ' rotateX(' + rx.toFixed(2) + 'deg)' : '') + (ry ? ' rotateY(' + ry.toFixed(2) + 'deg)' : '');
                     L.el.style.opacity = Math.max(0, op).toFixed(3);
