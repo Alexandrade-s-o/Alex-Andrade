@@ -425,46 +425,62 @@
            recorre todo el trayecto con warp, en vez de saltar de golpe) */
         @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 
-        /* Proyectos: carrusel HORIZONTAL con preview de cada web */
-        .proj-scroll-wrap { position: relative; }
-        .h-scroll {
-            display: flex; gap: 1.5rem;
-            overflow-x: auto; overflow-y: hidden;
-            scroll-snap-type: x proximity;
-            padding: 4px 4px 1.25rem;
-            scrollbar-width: thin; scrollbar-color: var(--accent) transparent;
+        /* PROYECTOS: GALERÍA FLOTANTE — mini-ventanas de navegador levitando en el
+           ambiente, cada una con el sitio REAL embebido (scrolleable y navegable aquí
+           mismo). 'translate'/'rotate' como propiedades separadas para que la levitación
+           no pelee con el transform del túnel. */
+        .float-gallery {
+            display: flex; flex-wrap: wrap; gap: 2.2rem 2rem;
+            justify-content: center; align-items: flex-start;
+            padding-top: 0.5rem;
         }
-        .h-scroll::-webkit-scrollbar { height: 8px; }
-        .h-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 9999px; }
-        .h-scroll::-webkit-scrollbar-track { background: transparent; }
-        .proj-card {
-            scroll-snap-align: start; flex: 0 0 auto;
-            width: clamp(270px, 80vw, 360px);
-            display: flex; flex-direction: column;
+        .float-card {
+            width: clamp(300px, 38vw, 430px);
+            border-radius: 14px; overflow: hidden;
             background: var(--card); border: 1px solid var(--border);
-            border-radius: 16px; overflow: hidden;
-            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: var(--card-shadow);
+            rotate: var(--frot, 0deg);
+            animation: fc-float var(--fdur, 8s) ease-in-out var(--fdel, 0s) infinite;
+            transition: border-color 0.25s ease;
+            will-change: translate;
         }
-        .proj-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: var(--card-shadow); }
-        .proj-preview {
-            aspect-ratio: 16 / 10; width: 100%;
-            background: linear-gradient(135deg, #ffffff, #ffe1e6);
-            border-bottom: 1px solid var(--border); overflow: hidden;
+        .float-card:hover { border-color: var(--accent); }
+        .f1 { --fdur: 7.2s; --fdel: 0s;    --frot: -1.3deg; }
+        .f2 { --fdur: 8.6s; --fdel: -2.1s; --frot: 1.1deg;  margin-top: 3.2rem; }
+        .f3 { --fdur: 7.9s; --fdel: -4.3s; --frot: -0.7deg; margin-top: 1.1rem; }
+        .f4 { --fdur: 9.1s; --fdel: -1.2s; --frot: 1.4deg;  margin-top: 3.8rem; }
+        .f5 { --fdur: 8.3s; --fdel: -3.2s; --frot: -1deg;   margin-top: 0.8rem; }
+        @keyframes fc-float {
+            0%, 100% { translate: 0 0; }
+            50% { translate: 0 -13px; }
         }
-        .proj-preview img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
-        .proj-body { padding: 1.05rem 1.25rem 1.2rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
-        .gh-name { font-size: 1.1rem; font-weight: 700; color: var(--text); word-break: break-word; }
-        .proj-link { color: var(--accent); font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
-        .proj-arrow {
-            position: absolute; top: 38%; transform: translateY(-50%); z-index: 3;
-            width: 2.75rem; height: 2.75rem; border-radius: 9999px;
-            background: var(--card); border: 1px solid var(--border); color: var(--text);
-            font-size: 1.4rem; line-height: 1; cursor: pointer; box-shadow: var(--card-shadow);
-            display: none; align-items: center; justify-content: center; transition: border-color 0.2s ease, color 0.2s ease;
+        .fc-bar {
+            display: flex; align-items: center; gap: 6px;
+            padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--border);
         }
-        .proj-arrow:hover { border-color: var(--accent); color: var(--accent); }
-        .proj-prev { left: -1.1rem; } .proj-next { right: -1.1rem; }
-        @media (min-width: 768px) { .proj-arrow { display: flex; } }
+        .fc-dot { width: 10px; height: 10px; border-radius: 9999px; background: var(--border); flex: none; }
+        .fc-dot:first-child { background: var(--accent); }
+        .fc-title { margin-left: 0.4rem; flex: 1; font-weight: 600; font-size: 0.92rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fc-open { color: var(--accent); font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
+        .fc-open:hover { text-decoration: underline; }
+        .fc-screen { position: relative; height: 400px; overflow: hidden; background: linear-gradient(135deg, #ffffff, #ffe9ec); }
+        .fc-screen iframe { width: 1100px; border: 0; display: block; transform-origin: 0 0; background: #fff; }
+        .fc-cover {
+            position: absolute; inset: 0; z-index: 2;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            gap: 2px; padding-bottom: 0.9rem; border: 0; cursor: pointer; font: inherit;
+            color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(180deg, transparent 58%, rgba(10, 15, 30, 0.55));
+            transition: opacity 0.25s ease;
+        }
+        .fc-cover span { font-weight: 700; font-size: 0.95rem; }
+        .fc-cover em { font-style: normal; font-size: 0.78rem; opacity: 0.9; }
+        .fc-cover.off { opacity: 0; pointer-events: none; }
+        @media (max-width: 640px) {
+            .float-card { width: 100%; margin-top: 0 !important; }
+            .fc-screen { height: 340px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .float-card { animation: none; } }
     </style>
 </head>
 <body class="antialiased">
@@ -665,13 +681,9 @@
                 <div class="max-w-2xl mb-12">
                     <p class="eyebrow mb-3" data-lang="projects_eyebrow">Trabajo seleccionado</p>
                     <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-strong mb-4" data-lang="projects_title">Proyectos</h2>
-                    <p class="text-muted leading-relaxed" data-lang="projects_subtitle">Algunos de mis proyectos, en vivo. Desliza en horizontal y entra a cualquiera.</p>
+                    <p class="text-muted leading-relaxed" data-lang="projects_subtitle">Mis proyectos flotan en el ambiente — cada ventana es el sitio real: scrollea y navégalo aquí mismo.</p>
                 </div>
-                <div class="proj-scroll-wrap max-w-6xl">
-                    <button class="proj-arrow proj-prev" type="button" aria-label="Anterior">‹</button>
-                    <div id="gh-projects" class="h-scroll" aria-label="Proyectos"></div>
-                    <button class="proj-arrow proj-next" type="button" aria-label="Siguiente">›</button>
-                </div>
+                <div id="float-gallery" class="float-gallery max-w-6xl" aria-label="Proyectos flotando en el ambiente"></div>
                 <div class="mt-10">
                     <a href="https://github.com/Alexandrade-s-o" target="_blank" rel="noopener" class="btn btn-secondary" data-lang="projects_all">Ver todos en GitHub ↗</a>
                 </div>
@@ -1172,7 +1184,8 @@
                     skills_eyebrow: "Lo que hago",
                     skills_title: "Mis Habilidades", skills_ae_title: "HTML5 &amp; CSS3", skills_ae_desc: "Maquetación semántica, responsive y accesible. Layouts modernos con Flexbox, Grid y Tailwind.", skills_pr_title: "JavaScript", skills_pr_desc: "Interactividad y lógica del lado del cliente con JavaScript moderno (ES6+) y APIs del navegador.", skills_ps_title: "React &amp; Frameworks", skills_ps_desc: "Aplicaciones web dinámicas con React y componentes reutilizables, escalables y mantenibles.", skills_ai_title: "Animación Web &amp; UI/UX", skills_ai_desc: "Interfaces y animaciones fluidas con GSAP, Three.js y WebGL para experiencias inmersivas.",
                     projects_eyebrow: "Trabajo seleccionado",
-                    projects_title: "Proyectos", projects_subtitle: "Algunos de mis proyectos, en vivo. Desliza en horizontal y entra a cualquiera.",
+                    projects_title: "Proyectos", projects_subtitle: "Mis proyectos flotan en el ambiente — cada ventana es el sitio real: scrollea y navégalo aquí mismo.",
+                    fg_cover: "Explora el sitio aquí mismo", fg_hint: "clic para navegar y scrollear dentro",
                     projects_loading: "Cargando proyectos desde GitHub…", projects_all: "Ver todos en GitHub ↗",
                     contact_eyebrow: "Hablemos",
                     contact_title: "Ponte en Contacto", contact_subtitle: "Puedes contactarme directamente a través de los siguientes medios:", contact_phone: "WhatsApp / Teléfono",
@@ -1198,7 +1211,8 @@
                     skills_title: "My Skills", skills_ae_title: "HTML5 &amp; CSS3", skills_ae_desc: "Semantic, responsive and accessible markup. Modern layouts with Flexbox, Grid and Tailwind.", skills_pr_title: "JavaScript", skills_pr_desc: "Client-side interactivity and logic with modern JavaScript (ES6+) and browser APIs.",
                     skills_ps_title: "React &amp; Frameworks", skills_ps_desc: "Dynamic web apps with React and reusable, scalable, maintainable components.", skills_ai_title: "Web Animation &amp; UI/UX", skills_ai_desc: "Fluid interfaces and animations with GSAP, Three.js and WebGL for immersive experiences.",
                     projects_eyebrow: "Selected work",
-                    projects_title: "Projects", projects_subtitle: "A few of my projects, live. Scroll horizontally and open any of them.",
+                    projects_title: "Projects", projects_subtitle: "My projects float in the space — every window is the real site: scroll and browse it right here.",
+                    fg_cover: "Explore the site right here", fg_hint: "click to browse and scroll inside",
                     projects_loading: "Loading projects from GitHub…", projects_all: "See all on GitHub ↗",
                     contact_eyebrow: "Let's talk",
                     contact_title: "Get In Touch", contact_subtitle: "You can reach me directly via the following means:", contact_phone: "WhatsApp / Phone",
@@ -1209,9 +1223,9 @@
             // --- LÓGICA DE IDIOMA ---
             const langEsBtn = document.getElementById('lang-es');
             const langEnBtn = document.getElementById('lang-en');
-            const translatableElements = document.querySelectorAll('[data-lang]');
             const setLanguage = (lang) => {
-                translatableElements.forEach(el => { const key = el.getAttribute('data-lang'); if (translations[lang] && translations[lang][key]) { el.innerHTML = translations[lang][key]; } });
+                // Consulta en vivo: también traduce nodos generados después (galería flotante, etc.)
+                document.querySelectorAll('[data-lang]').forEach(el => { const key = el.getAttribute('data-lang'); if (translations[lang] && translations[lang][key]) { el.innerHTML = translations[lang][key]; } });
                 if (lang === 'es') { langEsBtn.classList.add('active'); langEnBtn.classList.remove('active'); } else { langEnBtn.classList.add('active'); langEsBtn.classList.remove('active'); }
                 localStorage.setItem('language', lang);
                 document.documentElement.lang = lang;
@@ -1546,10 +1560,13 @@
             }, { passive: true });
             updateProgress();
 
-            // --- PROYECTOS: carrusel HORIZONTAL con preview de cada web ---
-            (function renderProjects() {
-                const scroller = document.getElementById('gh-projects');
-                if (!scroller) return;
+            // --- PROYECTOS: GALERÍA FLOTANTE con los sitios REALES embebidos ---
+            // Cada proyecto es una mini-ventana de navegador levitando en el ambiente; dentro
+            // vive el sitio real (iframe): el visitante lo scrollea y navega aquí mismo.
+            // Un velo capta el primer clic para que la rueda no quede atrapada por accidente.
+            (function renderFloatGallery() {
+                const wrap = document.getElementById('float-gallery');
+                if (!wrap) return;
                 const projects = [
                     { name: 'Casa Azul', url: 'https://casa-azul-nine.vercel.app/' },
                     { name: 'Solidar', url: 'https://solidhar-beta.vercel.app/' },
@@ -1558,24 +1575,47 @@
                     { name: 'Malezarap', url: 'https://malezarap.vercel.app/' }
                 ];
                 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-                const shot1 = (u) => 'https://image.thum.io/get/width/720/crop/600/noanimate/' + u;
-                const shot2 = (u) => 'https://s.wordpress.com/mshots/v1/' + encodeURIComponent(u) + '?w=720';
-                scroller.innerHTML = projects.map((p) => {
+                wrap.innerHTML = projects.map((p, i) => {
                     const u = esc(p.url), n = esc(p.name);
-                    // Si el primer screenshot falla, intenta otro; si también falla, deja el degradado de fondo.
-                    const onerr = 'this.onerror=function(){this.style.display=\'none\'};this.src=\'' + shot2(p.url) + '\'';
-                    return '<a class="proj-card" href="' + u + '" target="_blank" rel="noopener" aria-label="' + n + '">' +
-                        '<div class="proj-preview"><img loading="lazy" alt="Vista previa de ' + n + '" src="' + shot1(p.url) + '" onerror="' + onerr + '"></div>' +
-                        '<div class="proj-body"><h3 class="gh-name">' + n + '</h3><span class="proj-link">Ver sitio ↗</span></div>' +
-                        '</a>';
+                    return '<article class="float-card f' + (i + 1) + '">' +
+                        '<div class="fc-bar"><span class="fc-dot"></span><span class="fc-dot"></span><span class="fc-dot"></span>' +
+                        '<span class="fc-title">' + n + '</span>' +
+                        '<a class="fc-open" href="' + u + '" target="_blank" rel="noopener" aria-label="Abrir ' + n + ' en una pestaña nueva">Abrir ↗</a></div>' +
+                        '<div class="fc-screen">' +
+                        '<iframe data-src="' + u + '" title="' + n + '" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>' +
+                        '<button class="fc-cover" type="button"><span data-lang="fg_cover">Explora el sitio aquí mismo</span><em data-lang="fg_hint">clic para navegar y scrollear dentro</em></button>' +
+                        '</div></article>';
                 }).join('');
+                if (typeof setLanguage === 'function') setLanguage(document.documentElement.lang === 'en' ? 'en' : 'es');
 
-                // Flechas de desplazamiento horizontal (visibles en desktop)
-                const step = () => Math.min(scroller.clientWidth * 0.9, 400);
-                const prev = document.querySelector('.proj-prev');
-                const next = document.querySelector('.proj-next');
-                if (prev) prev.addEventListener('click', () => scroller.scrollBy({ left: -step(), behavior: 'smooth' }));
-                if (next) next.addEventListener('click', () => scroller.scrollBy({ left: step(), behavior: 'smooth' }));
+                // Escala: el iframe renderiza el sitio a 1100px de ancho y se reduce al tamaño de la ventana
+                function sizeFrames() {
+                    wrap.querySelectorAll('.float-card').forEach((card) => {
+                        const screen = card.querySelector('.fc-screen');
+                        const f = card.querySelector('iframe');
+                        const s = Math.max(0.1, screen.clientWidth / 1100);
+                        f.style.transform = 'scale(' + s.toFixed(4) + ')';
+                        f.style.height = Math.ceil(screen.clientHeight / s) + 'px';
+                    });
+                }
+                sizeFrames();
+                window.addEventListener('resize', sizeFrames, { passive: true });
+
+                // Los sitios reales se cargan solo cuando la galería se acerca (rendimiento)
+                const loadFrames = () => wrap.querySelectorAll('iframe[data-src]').forEach((f) => { f.src = f.dataset.src; f.removeAttribute('data-src'); });
+                if (typeof IntersectionObserver !== 'undefined') {
+                    const io = new IntersectionObserver((entries) => {
+                        if (entries.some((e) => e.isIntersecting)) { loadFrames(); io.disconnect(); }
+                    }, { rootMargin: '700px' });
+                    io.observe(wrap);
+                } else { loadFrames(); }
+
+                // Velo: el primer clic activa la navegación dentro del sitio; al salir, vuelve
+                wrap.querySelectorAll('.float-card').forEach((card) => {
+                    const cover = card.querySelector('.fc-cover');
+                    cover.addEventListener('click', () => cover.classList.add('off'));
+                    card.addEventListener('pointerleave', () => cover.classList.remove('off'));
+                });
             })();
         });
     </script>
