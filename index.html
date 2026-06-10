@@ -13,45 +13,45 @@
     <style>
         /* ===== TEMA CLARO (por defecto) ===== */
         :root {
-            --bg: #FFFFFF;
-            --text: #0A0F1E;
-            --muted: #334155;
-            --accent: #BC002D;
+            --bg: #8E1220;
+            --text: #FBF1DD;
+            --muted: #EBCB91;
+            --accent: #E8B84B;
             --font-display: 'Space Grotesk', 'Inter', sans-serif;
-            --card: #FFFFFF;
-            --border: #E6EAF2;
-            --header-bg: rgba(255, 255, 255, 0.72);
-            --icon-bg: #EEF2F8;
-            --btn-sec-border: rgba(15, 23, 42, 0.16);
-            --code-text: #1E293B;
-            --code-shadow: rgba(255, 255, 255, 0.85);
-            --spotlight: rgba(188, 0, 45, 0.12);
-            --tok-kw: #9333ea; --tok-var: #2563eb; --tok-prop: #0e7490;
-            --tok-str: #15803d; --tok-punc: #0891b2; --tok-fn: #b45309; --tok-num: #c2410c;
-            --card-shadow: 0 16px 36px -28px rgba(2, 6, 23, 0.28);
-            --glass-bg: rgba(255, 255, 255, 0.92);
-            --glass-border: rgba(15, 23, 42, 0.12);
+            --card: #79101D;
+            --border: rgba(232, 184, 75, 0.30);
+            --header-bg: rgba(120, 12, 26, 0.62);
+            --icon-bg: rgba(232, 184, 75, 0.12);
+            --btn-sec-border: rgba(232, 184, 75, 0.5);
+            --code-text: #F1E4C9;
+            --code-shadow: rgba(0, 0, 0, 0);
+            --spotlight: rgba(232, 184, 75, 0.16);
+            --tok-kw: #F0CE78; --tok-var: #FBF1DD; --tok-prop: #E8B84B;
+            --tok-str: #E9C98F; --tok-punc: #F3D98C; --tok-fn: #F0B86E; --tok-num: #F4D58A;
+            --card-shadow: 0 18px 44px -24px rgba(0, 0, 0, 0.60);
+            --glass-bg: rgba(124, 15, 28, 0.72);
+            --glass-border: rgba(232, 184, 75, 0.28);
             --glass-blur: 14px;
         }
         /* ===== TEMA OSCURO (Antigravity) ===== */
         :root[data-theme="dark"] {
-            --bg: #05070D;
-            --text: #F2F5FA;
-            --muted: #AAB4C6;
-            --accent: #FF4D5E;
-            --card: #0B0F18;
-            --border: #1A2030;
-            --header-bg: rgba(5, 7, 13, 0.70);
-            --icon-bg: rgba(255, 255, 255, 0.06);
-            --btn-sec-border: rgba(255, 255, 255, 0.18);
-            --code-text: #C9D4E8;
+            --bg: #140306;
+            --text: #F5EEDD;
+            --muted: #C9B589;
+            --accent: #E8B84B;
+            --card: #1C0608;
+            --border: rgba(232, 184, 75, 0.20);
+            --header-bg: rgba(20, 3, 6, 0.72);
+            --icon-bg: rgba(232, 184, 75, 0.10);
+            --btn-sec-border: rgba(232, 184, 75, 0.4);
+            --code-text: #EFE3C8;
             --code-shadow: rgba(0, 0, 0, 0);
-            --spotlight: rgba(255, 77, 94, 0.18);
-            --tok-kw: #c792ea; --tok-var: #82aaff; --tok-prop: #7fdbca;
-            --tok-str: #c3e88d; --tok-punc: #89ddff; --tok-fn: #ffcb6b; --tok-num: #f78c6c;
-            --card-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
-            --glass-bg: rgba(11, 15, 24, 0.9);
-            --glass-border: rgba(255, 255, 255, 0.12);
+            --spotlight: rgba(232, 184, 75, 0.18);
+            --tok-kw: #F0CE78; --tok-var: #FBF1DD; --tok-prop: #E8B84B;
+            --tok-str: #E9C98F; --tok-punc: #F3D98C; --tok-fn: #F0B86E; --tok-num: #F4D58A;
+            --card-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.8);
+            --glass-bg: rgba(28, 6, 8, 0.85);
+            --glass-border: rgba(232, 184, 75, 0.22);
         }
         html { transition: background-color 0.4s ease; }
 
@@ -156,10 +156,10 @@
             transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
         }
         .btn:hover { transform: translateY(-2px); }
-        .btn-primary { background-color: var(--accent); color: #FFFFFF; }
-        .btn-primary:hover { background-color: #9E0026; }
+        .btn-primary { background-color: var(--accent); color: #5E0A14; }
+        .btn-primary:hover { background-color: #D4A23C; }
         .btn-secondary { border: 1px solid var(--btn-sec-border); color: var(--text); }
-        .btn-secondary:hover { border-color: var(--accent); background-color: rgba(188, 0, 45, 0.08); }
+        .btn-secondary:hover { border-color: var(--accent); background-color: rgba(232, 184, 75, 0.12); }
 
         /* Glow sutil y profundo para el hero */
         #hero-background {
@@ -170,8 +170,8 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
-            background: radial-gradient(ellipse at 75% 25%, rgba(188, 0, 45, 0.10), transparent 55%),
-                        radial-gradient(ellipse at 15% 85%, rgba(255, 82, 82, 0.06), transparent 55%);
+            background: radial-gradient(ellipse at 75% 25%, rgba(232, 184, 75, 0.12), transparent 55%),
+                        radial-gradient(ellipse at 15% 85%, rgba(232, 184, 75, 0.07), transparent 55%);
             animation: subtle-aurora 28s infinite alternate;
         }
         @keyframes subtle-aurora {
@@ -210,7 +210,7 @@
 
         /* Cada palabra usa un tratamiento tipográfico distinto */
         .style-gradient {
-            background: linear-gradient(92deg, var(--accent), #FF5252 78%);
+            background: linear-gradient(92deg, #F3D98C, var(--accent) 78%);
             -webkit-background-clip: text; background-clip: text; color: transparent;
         }
         .style-solid   { color: var(--text); }
@@ -219,7 +219,7 @@
             -webkit-text-stroke: 2px var(--accent);
         }
         .style-italic  { font-style: italic; font-weight: 600; color: var(--muted); }
-        .style-glow    { color: var(--accent); text-shadow: 0 0 26px rgba(188, 0, 45, 0.45); }
+        .style-glow    { color: var(--accent); text-shadow: 0 0 26px rgba(232, 184, 75, 0.5); }
 
         @media (prefers-reduced-motion: reduce) {
             #hero-rotator, #hero-parallax { transition: none !important; transform: none !important; }
@@ -298,7 +298,7 @@
             top: 0; left: 0;
             height: 2px;
             width: 0;
-            background: linear-gradient(90deg, #BC002D, #FF5252);
+            background: linear-gradient(90deg, #E8B84B, #F3D98C);
             z-index: 60;
             pointer-events: none;
         }
@@ -397,8 +397,8 @@
         }
         .tl-line-fill {
             width: 100%; height: 100%;
-            background: linear-gradient(180deg, #FF5252, var(--accent));
-            box-shadow: 0 0 16px rgba(188, 0, 45, 0.55);
+            background: linear-gradient(180deg, #F3D98C, var(--accent));
+            box-shadow: 0 0 16px rgba(232, 184, 75, 0.55);
             border-radius: inherit;
         }
         .tl-item { position: relative; margin: 2.4rem 0; padding-left: 2.8rem; }
@@ -407,7 +407,7 @@
             border-radius: 9999px; background: var(--bg); border: 3px solid var(--accent);
             transition: background 0.25s ease, box-shadow 0.25s ease; z-index: 2;
         }
-        .tl-lit .tl-dot { background: var(--accent); box-shadow: 0 0 18px rgba(188, 0, 45, 0.8); }
+        .tl-lit .tl-dot { background: var(--accent); box-shadow: 0 0 18px rgba(232, 184, 75, 0.8); }
         .tl-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.15rem 1.4rem; transition: border-color 0.25s ease; }
         .tl-lit .tl-card { border-color: var(--accent); }
         .tl-year { color: var(--accent); font-weight: 700; font-size: 0.82rem; letter-spacing: 0.08em; }
@@ -463,7 +463,7 @@
         .fc-title { margin-left: 0.4rem; flex: 1; font-weight: 600; font-size: 0.92rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .fc-open { color: var(--accent); font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
         .fc-open:hover { text-decoration: underline; }
-        .fc-screen { position: relative; height: 400px; overflow: hidden; background: linear-gradient(135deg, #ffffff, #ffe9ec); }
+        .fc-screen { position: relative; height: 400px; overflow: hidden; background: linear-gradient(135deg, #fffaf0, #f3e4c4); }
         .fc-screen iframe { width: 1100px; border: 0; display: block; transform-origin: 0 0; background: #fff; }
         .fc-cover {
             position: absolute; inset: 0; z-index: 2;
@@ -780,9 +780,9 @@
                 '  vec2 q = vec2(fbm(p*2.2 + vec2(0.0, t)), fbm(p*2.2 + vec2(5.2,1.3) - t));',
                 '  vec2 r = vec2(fbm(p*2.2 + 2.8*q + vec2(1.7,9.2) + m*0.7 + 0.5*t), fbm(p*2.2 + 2.8*q + vec2(8.3,2.8) - m*0.7));',
                 '  float f = fbm(p*2.2 + 2.4*r);',
-                '  vec3 cBlue = vec3(0.85,0.05,0.18);',
-                '  vec3 cCyan = vec3(0.98,0.42,0.35);',
-                '  vec3 cViol = vec3(0.78,0.10,0.30);',
+                '  vec3 cBlue = vec3(0.82,0.62,0.24);',
+                '  vec3 cCyan = vec3(0.95,0.78,0.42);',
+                '  vec3 cViol = vec3(0.62,0.42,0.16);',
                 '  vec3 col = mix(cBlue, cCyan, smoothstep(0.1,0.9,f));',
                 '  col = mix(col, cViol, smoothstep(0.35,1.0, length(r)));',
                 '  float glow = pow(clamp(f,0.0,1.0), 1.4);',
@@ -809,7 +809,7 @@
             // ===== PASADA 2: PANORAMA 3D — viaje de cámara guiado por el scroll =====
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 6000);
-            scene.fog = new THREE.FogExp2(0x05070d, 0.00035);
+            scene.fog = new THREE.FogExp2(0x8e1220, 0.00035);
 
             // Sprite circular suave para dar brillo a las partículas
             function makeDot() {
@@ -847,7 +847,7 @@
             const sPos = new Float32Array(STAR_COUNT * 3);
             const sCol = new Float32Array(STAR_COUNT * 3);
             const sSpd = new Float32Array(STAR_COUNT);
-            const palette = [new THREE.Color(0xff4d5e), new THREE.Color(0xff6b6b), new THREE.Color(0xff8a80), new THREE.Color(0xffffff)];
+            const palette = [new THREE.Color(0xF0CE78), new THREE.Color(0xF3D98C), new THREE.Color(0xFCE7BE), new THREE.Color(0xffffff)];
             for (let i = 0; i < STAR_COUNT; i++) {
                 sPos[i * 3]     = (Math.random() - 0.5) * FIELD;
                 sPos[i * 3 + 1] = (Math.random() - 0.5) * FIELD;
@@ -878,16 +878,16 @@
             (function () {
                 const g = new THREE.Group();
                 const geo = new THREE.IcosahedronGeometry(150, 1);
-                g.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(0xff4d5e, 0xbc002d, 0.55, 0.30)));
-                g.add(new THREE.Points(geo, glowMat(0xff6b6b, 0xbc002d, 18, 0.90, 0.50)));
+                g.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(0xF0CE78, 0xE8B84B, 0.55, 0.30)));
+                g.add(new THREE.Points(geo, glowMat(0xF3D98C, 0xE8B84B, 18, 0.90, 0.50)));
                 reg(g, 0.06, (time) => { g.rotation.y = time * 0.15; g.rotation.x = time * 0.07; });
             })();
 
             // Estación 1 — Portal (Sobre mí): dos anillos que la cámara atraviesa
             (function () {
                 const g = new THREE.Group();
-                const r1 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(270, 7, 8, 64)), lineMat(0xff6b6b, 0xc8102e, 0.50, 0.30));
-                const r2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(185, 5, 6, 50)), lineMat(0xff8a80, 0xbc002d, 0.46, 0.28));
+                const r1 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(270, 7, 8, 64)), lineMat(0xF3D98C, 0xD4A23C, 0.50, 0.30));
+                const r2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(185, 5, 6, 50)), lineMat(0xFCE7BE, 0xE8B84B, 0.46, 0.28));
                 g.add(r1, r2);
                 reg(g, 0.28, (time) => { r1.rotation.z = time * 0.20; r2.rotation.z = -time * 0.30; r2.rotation.x = time * 0.15; });
             })();
@@ -896,8 +896,8 @@
             (function () {
                 const g = new THREE.Group();
                 const geo = new THREE.OctahedronGeometry(46, 0);
-                const hd = [0xff5252, 0xff7043, 0xe63946, 0xff8a80];
-                const hl = [0xc8102e, 0xd7263d, 0xbc002d, 0xe63946];
+                const hd = [0xF0CE78, 0xE8B84B, 0xEAC264, 0xFCE7BE];
+                const hl = [0xD4A23C, 0xDDB050, 0xE8B84B, 0xEAC264];
                 const nodes = [];
                 for (let k = 0; k < 4; k++) {
                     const ang = k / 4 * Math.PI * 2;
@@ -916,7 +916,7 @@
                 const edges = new THREE.EdgesGeometry(new THREE.PlaneGeometry(220, 130));
                 for (let k = 0; k < 5; k++) {
                     const ang = k / 5 * Math.PI * 2;
-                    const panel = new THREE.LineSegments(edges, lineMat(0xff4d5e, 0xbc002d, 0.50, 0.30));
+                    const panel = new THREE.LineSegments(edges, lineMat(0xF0CE78, 0xE8B84B, 0.50, 0.30));
                     panel.position.set(Math.cos(ang) * 300, Math.sin(ang) * 185, (k - 2) * 45);
                     panel.rotation.z = ang;
                     g.add(panel);
@@ -927,8 +927,8 @@
             // Estación 4 — Faro de contacto (Contacto): esfera de puntos + anillo
             (function () {
                 const g = new THREE.Group();
-                const ball = new THREE.Points(new THREE.IcosahedronGeometry(58, 3), glowMat(0xff6b6b, 0xbc002d, 10, 0.95, 0.60));
-                const ring = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(140, 4, 6, 50)), lineMat(0xff4d5e, 0xbc002d, 0.60, 0.34));
+                const ball = new THREE.Points(new THREE.IcosahedronGeometry(58, 3), glowMat(0xF3D98C, 0xE8B84B, 10, 0.95, 0.60));
+                const ring = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(140, 4, 6, 50)), lineMat(0xF0CE78, 0xE8B84B, 0.60, 0.34));
                 g.add(ball, ring);
                 reg(g, 0.93, (time) => { ball.rotation.y = time * 0.30; ring.rotation.x = time * 0.40; ring.rotation.z = time * 0.20; ball.scale.setScalar(1 + Math.sin(time * 2) * 0.06); });
             })();
@@ -954,11 +954,11 @@
                 isDark = dark;
                 uniforms.u_dark.value = dark ? 1.0 : 0.0;
                 // Tema claro = FONDO BLANCO PLANO (sin nebulosa); tema oscuro = nebulosa espacial
-                renderer.setClearColor(dark ? 0x05070d : 0xf7f9fb, 1);
-                scene.fog.color.set(dark ? 0x05070d : 0xf7f9fb); // niebla = color del fondo -> profundidad sobre blanco
-                starMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
-                starMat.color.set(dark ? 0xffffff : 0xc8102e);
-                starMat.opacity = dark ? 0.95 : 0.55;
+                renderer.setClearColor(dark ? 0x140306 : 0x8e1220, 1);
+                scene.fog.color.set(dark ? 0x140306 : 0x8e1220); // niebla = color del fondo (rojo laca / negro)
+                starMat.blending = THREE.AdditiveBlending;        // oro que brilla como ascuas
+                starMat.color.set(0xffffff);                      // deja ver los colores oro del palette
+                starMat.opacity = dark ? 0.95 : 0.8;
                 starMat.needsUpdate = true;
                 themeMats.forEach((m) => {
                     m.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
@@ -1114,8 +1114,8 @@
                 x.fillStyle = g; x.fillRect(0, 0, 32, 32);
                 return c;
             }
-            const spriteLight = makeSprite('188,0,45');    // rojo (Hinomaru) sobre blanco
-            const spriteDark = makeSprite('255,138,138');  // rojo claro sobre oscuro
+            const spriteLight = makeSprite('232,184,75');  // oro sobre rojo laca
+            const spriteDark = makeSprite('250,231,190');  // oro pálido sobre negro
 
             const N = isMobile ? 22 : 45;
             const dust = [];
