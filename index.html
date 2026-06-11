@@ -842,7 +842,7 @@
             const glowMat = (d, l, size, od, ol) => tMat(new THREE.PointsMaterial({ size: size, map: dotTex, transparent: true, depthWrite: false, sizeAttenuation: true }), d, l, od, ol);
 
             // --- Campo de estrellas envolvente e infinito (siempre rodea la cámara) ---
-            const STAR_COUNT = isMobile ? 320 : 750;
+            const STAR_COUNT = isMobile ? 140 : 280;
             const FIELD = 1700, SPAN = 3000;
             const sPos = new Float32Array(STAR_COUNT * 3);
             const sCol = new Float32Array(STAR_COUNT * 3);
@@ -859,7 +859,7 @@
             const starGeo = new THREE.BufferGeometry();
             starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
             starGeo.setAttribute('color', new THREE.BufferAttribute(sCol, 3));
-            const starMat = new THREE.PointsMaterial({ size: isMobile ? 5 : 6.5, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
+            const starMat = new THREE.PointsMaterial({ size: isMobile ? 3.5 : 4.5, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true });
             const stars = new THREE.Points(starGeo, starMat);
             stars.frustumCulled = false;
             scene.add(stars);
@@ -874,64 +874,35 @@
                 scene.add(group);
             }
 
-            // Estación 0 — Núcleo neuronal (Inicio)
-            (function () {
+            // --- ESTACIONES MINIMAL: un solo motivo — anillos ensō de oro, finos y serenos ---
+            // Nada de mallas wireframe: una o dos circunferencias limpias por sección, girando
+            // muy despacio. 3D con espacio vacío (ma), no con ruido.
+            function ringMesh(radius, tube) {
+                return new THREE.Mesh(
+                    new THREE.TorusGeometry(radius, tube, 12, 96),
+                    tMat(new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false }), 0xF0CE78, 0xE8B84B, 0.45, 0.30)
+                );
+            }
+            function ensoStation(t, radii, speed) {
                 const g = new THREE.Group();
-                const geo = new THREE.IcosahedronGeometry(150, 1);
-                g.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(0xF0CE78, 0xE8B84B, 0.55, 0.30)));
-                g.add(new THREE.Points(geo, glowMat(0xF3D98C, 0xE8B84B, 18, 0.90, 0.50)));
-                reg(g, 0.06, (time) => { g.rotation.y = time * 0.15; g.rotation.x = time * 0.07; });
-            })();
-
-            // Estación 1 — Portal (Sobre mí): dos anillos que la cámara atraviesa
-            (function () {
-                const g = new THREE.Group();
-                const r1 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(270, 7, 8, 64)), lineMat(0xF3D98C, 0xD4A23C, 0.50, 0.30));
-                const r2 = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(185, 5, 6, 50)), lineMat(0xFCE7BE, 0xE8B84B, 0.46, 0.28));
-                g.add(r1, r2);
-                reg(g, 0.28, (time) => { r1.rotation.z = time * 0.20; r2.rotation.z = -time * 0.30; r2.rotation.x = time * 0.15; });
-            })();
-
-            // Estación 2 — Constelación de habilidades (Habilidades): 4 nodos en anillo
-            (function () {
-                const g = new THREE.Group();
-                const geo = new THREE.OctahedronGeometry(46, 0);
-                const hd = [0xF0CE78, 0xE8B84B, 0xEAC264, 0xFCE7BE];
-                const hl = [0xD4A23C, 0xDDB050, 0xE8B84B, 0xEAC264];
-                const nodes = [];
-                for (let k = 0; k < 4; k++) {
-                    const ang = k / 4 * Math.PI * 2;
-                    const n = new THREE.Group();
-                    n.position.set(Math.cos(ang) * 230, Math.sin(ang) * 150, 0);
-                    n.add(new THREE.LineSegments(new THREE.WireframeGeometry(geo), lineMat(hd[k], hl[k], 0.60, 0.32)));
-                    n.add(new THREE.Points(geo, glowMat(hd[k], hl[k], 14, 0.90, 0.50)));
-                    g.add(n); nodes.push(n);
-                }
-                reg(g, 0.50, (time) => { g.rotation.z = time * 0.10; nodes.forEach((n, i) => { n.rotation.y = time * 0.5 + i; n.rotation.x = time * 0.4; }); });
-            })();
-
-            // Estación 3 — Galería de proyectos (Proyectos): paneles flotantes
-            (function () {
-                const g = new THREE.Group();
-                const edges = new THREE.EdgesGeometry(new THREE.PlaneGeometry(220, 130));
-                for (let k = 0; k < 5; k++) {
-                    const ang = k / 5 * Math.PI * 2;
-                    const panel = new THREE.LineSegments(edges, lineMat(0xF0CE78, 0xE8B84B, 0.50, 0.30));
-                    panel.position.set(Math.cos(ang) * 300, Math.sin(ang) * 185, (k - 2) * 45);
-                    panel.rotation.z = ang;
-                    g.add(panel);
-                }
-                reg(g, 0.72, (time) => { g.rotation.z = -time * 0.08; });
-            })();
-
-            // Estación 4 — Faro de contacto (Contacto): esfera de puntos + anillo
-            (function () {
-                const g = new THREE.Group();
-                const ball = new THREE.Points(new THREE.IcosahedronGeometry(58, 3), glowMat(0xF3D98C, 0xE8B84B, 10, 0.95, 0.60));
-                const ring = new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.TorusGeometry(140, 4, 6, 50)), lineMat(0xF0CE78, 0xE8B84B, 0.60, 0.34));
-                g.add(ball, ring);
-                reg(g, 0.93, (time) => { ball.rotation.y = time * 0.30; ring.rotation.x = time * 0.40; ring.rotation.z = time * 0.20; ball.scale.setScalar(1 + Math.sin(time * 2) * 0.06); });
-            })();
+                const rings = radii.map((r, i) => {
+                    const m = ringMesh(r, i === 0 ? 2.6 : 1.8);
+                    m.rotation.x = 0.18 * (i + 1);
+                    g.add(m);
+                    return m;
+                });
+                reg(g, t, (time) => {
+                    rings.forEach((m, i) => {
+                        m.rotation.z = time * speed * (i % 2 ? -0.5 : 0.35);
+                        m.rotation.y = Math.sin(time * 0.18 + i * 1.7) * 0.22;
+                    });
+                });
+            }
+            ensoStation(0.06, [210, 138], 0.5);  // Inicio
+            ensoStation(0.28, [260], 0.4);       // Sobre mí
+            ensoStation(0.50, [225], 0.45);      // Habilidades
+            ensoStation(0.72, [285], 0.35);      // Proyectos
+            ensoStation(0.93, [170, 108], 0.5);  // Contacto
 
             // Alinea cada estación con el centro real de su sección (scrollytelling)
             const SECTION_IDS = ['home', 'about', 'skills', 'projects', 'contact'];
@@ -958,7 +929,7 @@
                 scene.fog.color.set(dark ? 0x140306 : 0x8e1220); // niebla = color del fondo (rojo laca / negro)
                 starMat.blending = THREE.AdditiveBlending;        // oro que brilla como ascuas
                 starMat.color.set(0xffffff);                      // deja ver los colores oro del palette
-                starMat.opacity = dark ? 0.95 : 0.8;
+                starMat.opacity = dark ? 0.75 : 0.55;
                 starMat.needsUpdate = true;
                 themeMats.forEach((m) => {
                     m.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
@@ -1117,7 +1088,7 @@
             const spriteLight = makeSprite('232,184,75');  // oro sobre rojo laca
             const spriteDark = makeSprite('250,231,190');  // oro pálido sobre negro
 
-            const N = isMobile ? 10 : 22;
+            const N = isMobile ? 5 : 10;
             const dust = [];
             for (let i = 0; i < N; i++) {
                 const z = 0.3 + Math.random() * 0.7; // profundidad: mayor = más cerca/grande/rápido
